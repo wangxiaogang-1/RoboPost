@@ -1,0 +1,246 @@
+{% extends 'frame.html' %}
+{%load filter%}
+
+{% block css %}
+
+    <link href="/static/css/mod.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+                <div class="row">
+                    <!-- Start .row -->
+                    <!-- Start .page-header -->
+                    <div class="col-lg-12 heading">
+                        <h1 class="page-header"><i class="im-users"></i> 作业</h1>
+
+                        <button type="button" class="btn btn-success" id="title-btn" title="新建作业"><i class="im-plus"></i>&nbsp; 新建作业</button>
+
+                        <!-- Start .bredcrumb -->
+                        <ul id="crumb" class="breadcrumb"></ul>
+                        <!-- End .breadcrumb -->
+
+                    </div>
+                    <!-- End .page-header -->
+                </div>
+                <!-- End .row -->
+                <div class="outlet">
+                    <!-- Start .outlet -->
+                    <!-- Page start here ( usual with .row ) -->
+                    <div class="row" id="user-group-container">
+
+                        <div class="col-lg-12 col-md-4 col-sm-6 col-xs-12">
+
+                            <table class="table display" id="data_table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox"id="check-all">
+                                        </th>
+                                        <th>作业名称</th>
+                                        <th>项目</th>
+                                        <th>作者</th>
+                                        <th>创建时间</th>
+                                        <th>执行方式</th>
+                                        <th>开始时间</th>
+                                        <th>结束时间</th>
+                                        <th>耗时</th>
+                                        <th>状态</th>
+                                        <th>进度</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-content">
+                                    {% for work in data %}
+                                        <tr class="odd gradeX">
+                                            <td>
+                                                <input type="checkbox" class="check" data-workStatus="{{ work.work_status }}" value="{{ work.id }}">
+                                            </td>
+                                            <td>{{ work.work_name }}</td>
+                                            <td>{{ work.platform }}&nbsp;-&nbsp;{{ work.province }}&nbsp;-&nbsp;{{ work.project }}</td>
+                                            <td>{{ work.run_user }}</td>
+                                            <td>{{ work.create_time | parse_timestamp }}</td>
+                                            <td>{{ work.runway | translate_flag:'runway' }}</td>
+                                            <td>{{ work.start_time | parse_timestamp }}</td>
+                                            <td>{{ work.end_time | parse_timestamp }}</td>
+                                            <td>{{ work.start_time | sub_timestamp:work.end_time }}</td>
+                                            <td>{{ work.work_status | translate_flag:'work_status' }}</td>
+                                            <td>{{ work.run_status }}%</td>
+                                            <td>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="font-size: large;cursor: pointer;text-align: right;">
+                                                    {% if work.work_status == 0 %}
+                                                        <i class="im-play3 text-success run" data-id="{{ work.id }}" title="执行"></i>&nbsp;
+                                                        <i class="im-pencil text-warning update" data-id="{{ work.id }}" title="更新"></i>&nbsp;
+                                                    {% elif work.work_status == 1 %}
+                                                        <i class="im-stop2 text-dark stop" data-id="{{ work.id }}" title="停止"></i>&nbsp;
+                                                    {% endif %}
+                                                    {% if work.work_status != 0 %}
+                                                        <i class="im-eye text-primary review" data-id="{{ work.id }}" title="查看"></i>&nbsp;
+                                                    {% endif %}
+                                                    <i class="im-remove2 text-danger delete" data-id="{{ work.id }}" title="删除"></i>&nbsp;
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <!-- End .outlet -->
+                    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/assets/plugins/tables/datatables/jquery.dataTables.min.js"></script>
+    <script src="/static/assets/plugins/tables/datatables/jquery.dataTablesBS3.js"></script>
+    <script src="/static/assets/plugins/tables/datatables/tabletools/ZeroClipboard.js"></script>
+    <script src="/static/assets/plugins/tables/datatables/tabletools/TableTools.js"></script>
+    <script src="/static/assets/js/pages/data-tables.js"></script>
+    <script type="text/javascript">
+
+
+        function delete_work(ids){
+            if (ids === ''){
+                layer.msg('未选中任何作业！');
+                return false;
+            }
+            layer.confirm('确定删除作业记录？',function(){
+                $.post("{% url 'delete_work' %}",{ids : ids.toString()}, function(result){
+                    if(result === 'success'){
+                        layer.msg('已删除该作业！', function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        layer.msg('操作失败，请重试！');
+                    }
+                });
+            });
+        }
+
+        function run_works(ids){
+            $.post("{% url 'run_work' %}",{work_ids : ids.toString()}, function(result){
+                if(result === 'success'){
+                    layer.msg('选中的有效作业已执行！', function(){
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg('操作失败，请重试！');
+                }
+            });
+        }
+
+
+
+        $(document).ready(function(){
+
+            $('.run').click(function(){
+                window.location.href = "{% url 'run_work_single' %}?wid=" + $(this).attr('data-id');
+            });
+
+            $('.stop').click(function(){
+                $.post("{% url 'stop_work' %}",{'work_id' : ($(this).attr('data-id')*1)},function(result){
+                    layer.msg('作业已停止执行！',function(){
+                        window.location.reload()
+                    });
+                });
+            });
+
+            $('.review').click(function(){
+                window.location.href = "{% url 'show_work' %}?wid=" + $(this).attr('data-id');
+            });
+
+            $('#title-btn').click(function(){
+                window.location.href = '{% url "createOrUpdateWorkPage" %}';
+            });
+
+            $('.update').click(function(){
+                window.location.href = "{% url 'initUpdateWork' %}?wid=" + $(this).attr('data-id');
+            });
+
+            $('.delete').click(function(){
+                var ids = [$(this).attr('data-id')];
+                delete_work(ids);
+            });
+
+
+
+            $('#data_table').dataTable({
+                "sPaginationType": "bs_full",
+                "fnPreDrawCallback": function( oSettings ) {
+                    $('.dataTables_filter input').addClass('form-control input-large').attr('placeholder', '请输入关键词');
+                    $('.dataTables_length select').addClass('form-control input-small');
+                },
+                "oLanguage": {
+                    "sProcessing": "处理中...",
+                    "sLengthMenu": "显示 _MENU_ 项结果",
+                    "sZeroRecords": "没有匹配结果",
+                    "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                    "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜索:",
+                    "sUrl": "",
+                    "sEmptyTable": "表中数据为空",
+                    "sLoadingRecords": "载入中...",
+                    "sInfoThousands": ",",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上页",
+                        "sNext": "下页",
+                        "sLast": "末页"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": 以升序排列此列",
+                        "sSortDescending": ": 以降序排列此列"
+                    }
+                },
+                "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,5,6,7,8,9,10,11 ] }],
+                "bJQueryUI": false,
+                "bAutoWidth": false,
+                "sDom": "<'row'<'col-lg-3 col-md-3 col-sm-12 text-right'l><'col-lg-6 col-md-6 col-sm-12 text-right'T><'col-lg-3 col-md-3 col-sm-12 text-right'f>r>t<'row-'<'col-lg-6 col-md-6 col-sm-12'i><'col-lg-6 col-md-6 col-sm-12'p>>",
+                "oTableTools": {
+                    "sSwfPath": "/static/assets/plugins/tables/datatables/tabletools/swf/copy_csv_xls_pdf.swf",
+                    "aButtons": [
+                        {
+                            "sExtends":    "run",
+                            "sButtonText": '<i class="im-play3 s16 vat"></i> 执行',
+                            "aButtons":    [ "run" ],
+                            "fnClick": function(){
+                                var ids= [];
+                                $('#data-content').find(".check[data-workStatus=0]:checkbox").each(function(index, item){
+                                    if(true === $(item).is(':checked')){
+                                        ids.push($(item).val()*1);
+                                    }
+                                });
+                                if (ids.length === 0){
+                                    layer.msg('未选中任何作业！');
+                                    return false;
+                                }
+                                run_works(ids);
+                            }
+                        },{
+                            "sExtends":    "delete",
+                            "sButtonText": '<i class="im-remove2 s16 vat"></i> 删除',
+                            "aButtons":    [ "delete" ],
+                            "fnClick": function(){
+                                var ids= [];
+                                $('#data-content').find("input[type='checkbox']:checkbox").each(function(index, item){
+                                    if(true === $(item).is(':checked')){
+                                        ids.push($(item).val()*1);
+                                    }
+                                });
+                                delete_work(ids.join(','));
+                            }
+                        }
+                    ]
+                }
+            });
+
+        });
+
+    </script>
+
+{% endblock %}

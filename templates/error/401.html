@@ -1,0 +1,7 @@
+{% extends 'error_base.html' %}
+
+{% block error_code %}401{% endblock %}
+
+{% block error_msg %}请求的内容未经授权！{% endblock %}
+
+{% block error_details %}你请求的服务未包含系统指定的有效授权信息。{% endblock %}

@@ -1,0 +1,52 @@
+
+
+
+.btn-control {
+    position: absolute;
+    margin: 0.4em;
+}
+
+.control-addur {
+    right: 5.2em;
+}
+
+.control-modify {
+    right: 2.8em;
+}
+
+.control-del {
+    right: 0.4em;
+}
+
+.user-card:hover {
+    background: rgba(221, 221, 221, .4);
+}
+
+.user-card.active {
+    background: rgba(226, 239, 217, .5);
+}
+
+.user-card.active .tile-stats-icon i{
+    color : rgba(113, 211, 152, 1) !important;
+}
+
+.save-changes-btn-content {
+    position: absolute;
+    bottom: 0;
+    text-align: right;
+    background: #fff;
+}
+
+.user-group-empty .tile-stats {
+    font-size: 18px;
+    background: #f3f9e4;
+    border: transparent;
+    padding: .2em .5em;
+    text-align: center;
+}
+
+#createUserGroup {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}

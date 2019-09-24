@@ -1,0 +1,235 @@
+{% extends 'frame.html' %}
+
+{% block css %}
+
+    <link href="/static/css/userGroupList.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+                <div class="row">
+                    <!-- Start .row -->
+                    <!-- Start .page-header -->
+                    <div class="col-lg-12 heading">
+                        <h1 class="page-header"><i class="im-users"></i> 用户组管理</h1>
+
+                        <button type="button" class="btn btn-success" id="title-btn" title="新建用户组"><i class="im-plus"></i>&nbsp; 新建用户组</button>
+
+                        <!-- Start .bredcrumb -->
+                        <ul id="crumb" class="breadcrumb"></ul>
+                        <!-- End .breadcrumb -->
+
+                    </div>
+                    <!-- End .page-header -->
+                </div>
+                <!-- End .row -->
+                <div class="outlet">
+                    <!-- Start .outlet -->
+                    <!-- Page start here ( usual with .row ) -->
+                    <div class="row" id="user-group-container">
+
+                        <!-- User group here -->
+
+                        {% for group in data %}
+
+                            <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 user-group-card" data-userGroupId="{{ group.id }}">
+                                <div class="tile-stats b brall mb25">
+                                    <button type="button" class="btn btn-success btn-xs btn-round btn-control control-addur"><i class="en-user-add"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-xs btn-round btn-control control-modify"><i class="en-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-xs btn-round btn-control control-del"><i class="en-cross"></i>
+                                    </button>
+                                    <a href="#">
+                                        <div class="tile-stats-icon"><i class="im-users2 color-teal"></i>
+                                        </div>
+                                        <div class="tile-stats-content">
+                                            <div class="tile-stats-number ug-name">{{ group.name }}</div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {% empty %}
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 user-group-empty">
+                                    <div class="tile-stats b brall mb25">
+                                        抱歉，用户组列表为空
+                                    </div>
+                                </div>
+                        {% endfor %}
+
+                    </div>
+                    <!-- End .row -->
+                    <!-- Page End here -->
+                </div>
+                <!-- End .outlet -->
+            </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script type="text/javascript">
+
+        var userTemp =
+            '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" data-userId="%userId%">'+
+                '<div class="tile-stats b brall mb25 user-card %statusClass%">'+
+                    '<a href="#">'+
+                        '<div class="tile-stats-icon"><i class="st-%userIden%"></i>'+
+                        '</div>'+
+                        '<div class="tile-stats-content">'+
+                            '<div class="tile-stats-number">%first_name%%last_name%</div>'+
+                            '<div class="tile-stats-text">%username%</div>'+
+                        '</div>'+
+                        '<div class="clearfix"></div>'+
+                    '</a>'+
+                '</div>'+
+            '</div>';
+
+        var userIden = {'true' : 'sun','false' : 'user2'}
+        var statusClass = { 'true' : 'active','false' : ''}
+        var userInGroupsBackup = [];
+
+        function replaceStr(replaceString, keyVal){
+            var transString = replaceString + ' ';
+            $.each(keyVal, function(index, item){
+                transString = transString.replace(item.source, item.target)
+            });
+            return transString;
+        }
+
+        function compareList(list1, list2){
+            if(list1.length !== list2.length){
+                return false;
+            }
+            $.each(list1, function(index, item){
+                if(item !== list2[index]){
+                    return false;
+                }
+            })
+            return true;
+        }
+
+        function init(data){
+{#            if(typeof data !== Array){#}
+{#                layer.alert('数据格式错误！');#}
+{#            }#}
+            $.each(data,function(index,item){
+                var replaces = [{source : '%userGroupId%',target : index},{source : '%userGroupName%',target : item}];
+                $('#user-group-container').append(replaceStr(userGroupTemp, replaces));
+            });
+        }
+
+        function action(){
+
+            $('#title-btn').click(function(){
+                layer.prompt({title: '请输入用户组名称', formType: 0}, function(text, index){
+                    $.post("{% url 'createUserGroup' %}",{'name' : text}, function(result){
+                        if(result === 'success'){
+                            layer.msg('新的用户群组添加成功！', function(){
+                                window.location.reload()
+                            });
+                        }else{
+                            layer.msg('操作失败！');
+                        }
+                    });
+                    // layer.close(index)
+                });
+            });
+
+            $('.control-del').click(function(e){
+                var ids = [$(this).parents('.user-group-card').attr('data-userGroupId')];
+                layer.confirm('删除该用户组将删除该组所有用户及权限与其存在的关联关系，确定删除该用户组？',function(){
+                    $.post("{% url 'deleteUserGroup' %}",{ids : ids.toString()}, function(result){
+                        if(result === 'success'){
+                            layer.msg('已删除该用户群组！', function(){
+                                window.location.reload();
+                            });
+                        }else{
+                            layer.msg('操作失败！');
+                        }
+                    });
+                });
+            });
+
+            $('.control-modify').click(function(){
+                var id = $(this).parents('.user-group-card').attr('data-userGroupId');
+                var name = $(this).siblings('a').find('.ug-name').text();
+                layer.prompt({title: '请输入用户组名称', formType: 0, value : name}, function(text, index){
+                    $.post("{% url 'updateUserGroup' %}",{id : id, name: text}, function(result){
+                        if(result === 'success'){
+                            layer.msg('已更新该用户群组名称！', function(){
+                                window.location.reload();
+                            });
+                        }else{
+                            layer.msg('操作失败！');
+                        }
+                    });
+                    // layer.close(index)
+                });
+            });
+
+            $('.control-addur').click(function(){
+                var content = '';
+                var ugid = $(this).parents('.user-group-card').attr('data-userGroupId');
+                var name = $(this).siblings('a').find('.ug-name').text();
+                $.post("{% url 'initUserList' %}",{'userGroupId' : ugid}, function(result){
+                    var data = eval("(" + result + ")")
+                    $.each(data.users,function(index, item){
+                        if(statusClass[item.statusClass] === 'active'){
+                            userInGroupsBackup.push(item.id + "")
+                        }
+                        var replaces = [{source : '%userId%',target : item.id},{source : '%username%',target : item.username},
+                        {source : '%first_name%',target : item.first_name},{source : '%last_name%',target : item.last_name},
+                        {source : '%userIden%',target : userIden[item.is_superuser]}, {source : '%statusClass%',target : statusClass[item.statusClass]}];
+                        content += replaceStr(userTemp, replaces);
+                    });
+                    content +=
+                        '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 save-changes-btn-content">'+
+                            '<button type="button" class="btn btn-lg btn-primary" id="save-changes" data-ugid="' + ugid + '">保&nbsp;&nbsp;存</button>&nbsp;&nbsp;'+
+                            '<button type="button" class="btn btn-lg btn-wraning" id="cancel">取&nbsp;&nbsp;消</button>'+
+                        '</div>';
+                    var lyn = layer.open({
+                        title: name + '用户',
+                        type: 1,
+                        area: ['70%', '70%'],
+                        offset: '100px',
+                        content: content
+                    });
+                    $('.user-card').click(function(){
+                        $(this).toggleClass('active');
+                    });
+                    $('#save-changes').click(function(){
+                        var userIds = [];
+                        $.each($('.user-card'),function(index, item){
+                            if($(item).hasClass('active')){
+                                userIds.push($(item).parent().attr('data-userId'));
+                            }
+                        })
+                        if(!compareList(userInGroupsBackup, userIds)){
+                            $.post("{% url 'addUserToUserGroup' %}",{userGroupId : $(this).attr('data-ugid') ,userIds : JSON.stringify(userIds) },function(result){
+                                layer.msg('操作成功！',function(){
+                                    window.location.reload();
+                                });
+                            });
+                        }else{
+                            layer.msg('未做任何修改！');
+                        }
+                    })
+                    $('#cancel').click(function(){
+                        layer.close(lyn)
+                    })
+                });
+            });
+        }
+
+        $(document).ready(function(){
+            action();
+        });
+
+    </script>
+
+{% endblock %}

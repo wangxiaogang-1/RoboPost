@@ -1,0 +1,32 @@
+
+
+
+.btn-control {
+    position: absolute;
+    margin: 0.4em;
+}
+
+.control-modify,
+.control-view  {
+    right: 2.8em;
+}
+
+.control-del,
+.control-copy,
+#controls > .control-view {
+    right: 0.4em;
+}
+
+.card-item > .tile-stats:hover {
+    background: rgba(128, 194, 106, .7);
+    border-color: transparent;
+}
+
+.card-item > .tile-stats:hover .tile-stats-icon i:before {
+    color: #fff;
+
+}
+
+.card-item > .tile-stats:hover .proj-name {
+    color: #fff;
+}

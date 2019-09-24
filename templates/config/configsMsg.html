@@ -1,0 +1,231 @@
+{% extends 'frame.html' %}
+
+{% block css %}
+
+    <link href="/static/css/configMsg.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+        <div class="row">
+            <!-- Start .row -->
+            <!-- Start .page-header -->
+            <div class="col-lg-12 heading">
+                <h1 class="page-header"><i class="im-cogs"></i>配置信息</h1>
+
+                <button type="button" class="btn btn-primary" id="title-btn" title="返回"><i class="im-undo"></i>&nbsp; 返回</button>
+
+            </div>
+            <!-- End .page-header -->
+        </div>
+        <!-- End .row -->
+        <div class="outlet">
+            <!-- Start .outlet -->
+            <!-- Page start here ( usual with .row ) -->
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <!-- Start col-lg- 3 -->
+                    <div class="panel panel-default" data-id="apps">
+                        <!-- Start .panel -->
+                        <div class="panel-heading">
+                            <h4 class="panel-title">应用服务器</h4>
+                            <div class="panel-heading-content">
+                                <a href="#" class="btn btn-success btn-xs add" title="新增应用服务器配置信息"><i class="im-plus"></i>&nbsp;新增</a>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+
+                            {% for host in data.app %}
+
+                                <div class="data-list">
+                                    <div class="data-list-title" data-id="{{ host.id }}" data-cid="{{ host.app_info.id }}">
+                                        <h5>{{ host.IP }}</h5>
+                                        <span class="operator">
+                                            <a href="#" class="btn btn-warning btn-xs update" title="更新应用服务器配置信息"><i class="im-pencil"></i>&nbsp;&nbsp;更新</a>
+                                            <a href="#" class="btn btn-danger btn-xs delete" title="删除应用服务器配置信息"><i class="im-remove2"></i>&nbsp;&nbsp;删除</a>
+                                        </span>
+                                    </div>
+                                    <ul>
+                                        <li><span class="field-name">主机名</span><span class="field-value">{{ host.host_name }}</span></li>
+                                        <li><span class="field-name">平台</span><span class="field-value">{{ host.platform }}</span></li>
+                                        <li><span class="field-name">省市</span><span class="field-value">{{ host.province }}</span></li>
+                                        <li><span class="field-name">服务器类别</span><span class="field-value">{{ host.server_type }}</span></li>
+                                        <li><span class="field-name">账号</span><span class="field-value">{{ host.account }}</span></li>
+                                    </ul>
+                                    <ul>
+                                        <li><span class="field-name">项目目录</span><span class="field-value">{{ host.app_info.app_directory }}</span></li>
+                                        <li><span class="field-name">中间件类型</span><span class="field-value">{{ host.app_info.middleware_type }}</span></li>
+                                        <li><span class="field-name">中间件账号</span><span class="field-value">{{ host.app_info.middleware_name }}</span></li>
+                                        <li><span class="field-name">URL</span><span class="field-value">{{ host.app_info.url }}</span></li>
+                                        <li><span class="field-name">重启脚本</span><span class="field-value">{{ host.app_info.restart_script_path }}</span></li>
+                                        <li><span class="field-name">静态目录</span><span class="field-value">{{ host.app_info.static_directory }}</span></li>
+                                        <li><span class="field-name">缓存目录</span><span class="field-value">{{ host.app_info.cache_directory }}</span></li>
+                                    </ul>
+
+                                </div>
+                                <hr>
+                                {% empty %}
+                                没有任何数据
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                    <!-- End .panel -->
+
+                    <!-- Start col-lg- 3 -->
+                    <div class="panel panel-default" data-id="dbs">
+                        <!-- Start .panel -->
+                        <div class="panel-heading">
+                            <h4 class="panel-title">数据库服务器</h4>
+                            <div class="panel-heading-content">
+                                <a href="#" class="btn btn-primary btn-xs add" title="新增数据库服务器配置信息"><i class="im-plus"></i>&nbsp;新增</a>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+
+                            {% for db in data.db %}
+
+                                <div class="data-list">
+
+                                    <div class="data-list-title" data-id="{{ db.id }}" data-cid="{{ db.db_info.id }}">
+                                        <h5>{{ db.IP }}</h5>
+                                        <span class="operator">
+                                            <a href="#" class="btn btn-warning btn-xs update" title="更新应用服务器配置信息"><i class="im-pencil"></i>&nbsp;&nbsp;更新</a>
+                                            <a href="#" class="btn btn-danger btn-xs delete" title="删除应用服务器配置信息"><i class="im-remove2"></i>&nbsp;&nbsp;删除</a>
+                                        </span>
+                                    </div>
+                                    <ul>
+                                        <li><span class="field-name">主机名</span><span class="field-value">{{ db.host_name }}</span></li>
+                                        <li><span class="field-name">平台</span><span class="field-value">{{ db.platform }}</span></li>
+                                        <li><span class="field-name">省市</span><span class="field-value">{{ db.province }}</span></li>
+                                        <li><span class="field-name">服务器类别</span><span class="field-value">{{ db.server_type }}</span></li>
+                                        <li><span class="field-name">账号</span><span class="field-value">{{ db.account }}</span></li>
+                                    </ul>
+                                    <ul>
+                                        <li><span class="field-name">库名</span><span class="field-value">{{ db.db_info.name }}</span></li>
+                                        <li><span class="field-name">数据库账号</span><span class="field-value">{{ db.db_info.account }}</span></li>
+                                        <li><span class="field-name">端口</span><span class="field-value">{{ db.db_info.port }}</span></li>
+                                        <li><span class="field-name">tnsname</span><span class="field-value">{{ db.db_info.tnsname }}</span></li>
+                                    </ul>
+
+                                </div>
+                                {% empty %}
+                                没有任何数据
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                    <!-- End .panel -->
+
+                </div>
+
+            </div>
+            <!-- End .row -->
+            <!-- Page End here -->
+        </div>
+        <!-- End .outlet -->
+    </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script>
+
+        var host_id = -1, content_id = -1;
+
+        function popup(prop){
+            layer.open({
+              type: 2,
+              area: ['45%', '75%'],
+              title : prop.title,
+              content: prop.url
+            });
+        }
+
+        (function(){
+            $('#title-btn').click(function(){
+                window.history.back()
+            })
+            var ope_param = {
+                apps : {
+                    name : '应用',
+                    addOrUpdate : {
+                        url : '/conf/createOrUpdateAppServerConfig/'
+                    },
+                    del : {
+                        url : '/conf/deleteHostInfo/'
+                    }
+                },
+                dbs : {
+                    name : '数据库',
+                    addOrUpdate : {
+                        url : '/conf/createOrUpdateDbServerConfig/'
+                    },
+                    del : {
+                        url : '/conf/deleteDbInfo/'
+                    }
+                }
+            };
+            $('.add').click(function(){
+                host_id = -1, content_id = -1;
+                var ope_type = $(this).parents('.panel').attr('data-id');
+                var hostids = '?host_id=' + host_id + '&content_id=' + content_id + '&opt=a'
+                layer.open({
+                  type: 2,
+                  area: ['45%', '75%'],
+                  title : '创建' + ope_param[ope_type].name + '服务器配置',
+                  content: ope_param[ope_type].addOrUpdate.url + hostids
+                });
+            });
+
+            $('.update').click(function(){
+                var ope_type = $(this).parents('.panel').attr('data-id');
+                host_id = $(this).parents('.data-list-title').attr('data-id');
+                content_id = $(this).parents('.data-list-title').attr('data-cid');
+                if(host_id !== -1 & content_id !== -1){
+                    var hostids = '?host_id=' + host_id + '&content_id=' + content_id + '&opt=u'
+                    layer.open({
+                      type: 2,
+                      area: ['45%', '75%'],
+                      title : '更新' + ope_param[ope_type].name + '服务器配置',
+                      content: ope_param[ope_type].addOrUpdate.url + hostids
+                    });
+                }else{
+                    layer.msg('数据错误，请重试！')
+                }
+            });
+
+            $('.delete').click(function(){
+                host_id = $(this).parents('.data-list-title').attr('data-id');
+                if(host_id !== -1){
+                    ids = [host_id]
+                    layer.confirm('删除该服务器配置将删除关联的应用或数据库配置，确定删除该服务器配置？',function(){
+                    $.post("{% url 'deleteHostInfo' %}",{ids : ids.toString()}, function(result){
+                            if(result === 'success'){
+                                layer.msg('已删除该服务器配置！', function(){
+                                    window.location.reload();
+                                });
+                            }else{
+                                layer.msg('操作失败！');
+                            }
+                        });
+                    });
+                }else{
+                    layer.msg('数据错误，请重试！')
+                }
+            });
+
+
+
+        })();
+
+
+    </script>
+
+{% endblock %}

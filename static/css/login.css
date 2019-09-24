@@ -1,0 +1,28 @@
+/*
+    Login in Robopost
+    create date : 2018-07-19
+    author : QJ
+*/
+
+body {
+    overflow: hidden;
+}
+
+#login {
+    background: rgba(255, 255, 255, .1);
+    padding-top: 20px;
+    text-align: center;
+}
+
+#login img {
+    width: 80px;
+    border-radius: 100px;
+}
+
+.login-form {
+    padding: 10px 50px;
+}
+
+.login-btn {
+    width: 50%;
+}

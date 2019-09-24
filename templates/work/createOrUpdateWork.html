@@ -1,0 +1,355 @@
+JSON{% extends 'frame.html' %}
+{% load filter %}
+
+{% block css %}
+
+    <link href="/static/css/work.css" rel="stylesheet" />
+    <link href="/static/assets/plugins/layui/css/layui.css" rel="stylesheet" />
+    <style>
+        .file-upload {
+            display: none;
+        }
+        #files-preview {
+            height: 15em;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            border: solid 1px #eee;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+                <div class="row">
+                    <!-- Start .row -->
+                    <!-- Start .page-header -->
+                    <div class="col-lg-12 heading">
+                        <h1 class="page-header"><i class="im-users"></i> 新建作业</h1>
+
+                        <button type="button" class="btn btn-primary" id="title-btn" title="返回"><i class="im-undo"></i>&nbsp; 返回</button>
+
+
+                    </div>
+                    <!-- End .page-header -->
+                </div>
+                <!-- End .row -->
+                <div class="outlet">
+                    <!-- Start .outlet -->
+                    <form  class="form-horizontal" role="form">
+                        <input type="hidden" name="id" value="{{ work.id }}">
+                        <input type="hidden" name="run_user" value="{{ work.run_user | default:request.session.user.username }}">
+                        <input type="hidden" name="work_status" value="{{ work.work_status | default:0 }}">
+                        <input type="hidden" name="run_status" value="{{ work.run_status | default:0 }}">
+                        <!-- Page start here ( usual with .row ) -->
+                        <div class="row" id="user-group-container">
+
+                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 form-content" style="border-right: dashed 2px #ddd">
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">平台</label>
+                                    <div class="col-lg-5 col-md-10">
+                                        <select class="form-control host-selector" name="platform">
+                                            <option value="">--请选择平台--</option>
+                                            {% for platform in platforms %}
+                                                <option value="{{ platform }}"
+                                                    {% if work.platform == platform %}selected{% endif %}
+                                                >{{ platform }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">省市</label>
+                                    <div class="col-lg-5 col-md-10">
+                                        <select class="form-control host-selector" name="province">
+                                            <option value="">--请选择省市--</option>
+                                            {% for province in provinces %}
+                                                <option value="{{ province }}"
+                                                    {% if work.province == province %}selected{% endif %}
+                                                >{{ province }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">项目</label>
+                                    <div class="col-lg-5 col-md-10">
+                                        <select class="form-control host-selector" name="project">
+                                            <option value="">--请选择项目--</option>
+                                            {% for project in projects %}
+                                                <option value="{{ project.confV }}"
+                                                    {% if work.project == project.confV %}selected{% endif %}
+                                                >{{ project.confV }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">作业名称</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <input type="text" name="work_name" value="{{ work.work_name }}" class="form-control limitInput required" placeholder="请输入作业名称"  maxlength="20">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">描述</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <textarea class="form-control limitTextarea" name="work_info" maxlength="200" rows="5" style="resize: none">{{ work.work_info }}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">执行方式</label>
+                                    <div class="col-lg-4 col-md-4">
+                                        {% for way in runway %}
+                                            <label class="radio-inline">
+                                                <input type="radio" name="runway" value="{{ forloop.counter0 }}" {% if work.runway == forloop.counter0 %}checked{% endif %}>
+                                                {{ way }}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">定时规则</label>
+                                    <div class="col-lg-4 col-md-4">
+                                        <input type="text" class="form-control" name="time_rule" value="{{ work.time_rule }}" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">文件压缩包</label>
+                                    <div class="col-lg-3 col-md-3" id="file-content">
+                                        <input type="file" class="btn btn-primary" name="file_package_names" id="file_package_names" multiple value="选择文件压缩包">
+                                    </div>
+                                    <div class="col-lg-7 col-md-7">
+                                        <div class="list-group" id="files-preview">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">选择服务器</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <input type="hidden" name="host_list">
+                                        <div class="panel panel-default" style="border: solid 1px #e4e9eb;">
+                                            <div class="panel-body" style="border: none;">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>服务器类型</th>
+                                                            <th>IP地址</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="host-selector">
+
+                                                        {% for host in work.host_list %}
+                                                            <tr id="host_{{ host.id }}" class="host host-selected" onclick="toggleSelect(this);">
+                                                                <td>{{ host.server_type }}</td>
+                                                                <td>{{ host.IP }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-content">
+
+                                <input type="hidden" name="value_list"  value="/etc/val/text.zip">
+
+                                <div id="work-param">
+
+                                    {% for vl in work.value_list %}
+
+                                        <div class="form-group">
+                                            <label class="col-lg-3 col-md-3 col-sm-12 control-label">{{ vl.info }}</label>
+                                            <div class="col-lg-9 col-md-9">
+                                                <input type="text" data-v-index="{{ vl.key }}" data-v-info="{{ vl.info }}" class="value-list form-control left-icon" placeholder="请输入参数" value="{{ vl.value }}">
+                                                <i class="fa-dollar s16 left-input-icon"></i>
+                                            </div>
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10" style="text-align: center;padding: 30px 0;">
+
+                                <button type="button" class="btn btn-primary" id="save" style="width: 15%;">保&nbsp;&nbsp;存</button>
+
+                            </div>
+                            <!-- End .outlet -->
+                        </div>
+
+                    </form>
+
+                </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/assets/plugins/layui/layui.js"></script>
+    <script src="/static/plugins/layer/layer.js"></script>
+
+    <script type="text/javascript">
+
+        var selected_packages = ''
+
+        function toggleSelect(obj){
+            $(obj).toggleClass('host-selected');
+        }
+
+        $(document).ready(function(){
+
+            $('#file_package_names').change(function(){
+                var files = $('#file-content').find('input.file-upload').val().split(',');
+                var $files_preview = $('#files-preview');
+                $files_preview.html('');
+                $.each(files, function(index, item){
+                   $files_preview.append(
+                       '<a class="list-group-item" title="' + item + '"><i class="im-file4"></i>&nbsp;' + item + '</a>'
+                   );
+                });
+            });
+            $('#save').click(function(){
+                // 上传文件
+                var fileData = new FormData();
+                $.each($('#file_package_names')[0].files, function(index, item){
+                    fileData.append('fileList', item);
+                });
+                $.ajax({
+                    url: "{% url 'upload_mutifile' %}",
+                    type: 'POST',
+                    cache: false,
+                    data: fileData,
+                    processData: false,
+                    contentType: false,
+                    dataType:"json",
+                    complete : function(data) {
+                       if(data.responseText === 'exists'){
+                           layer.msg('上传文件失败：已存在相同文件！');
+                           return;
+                       }
+                       if(data.responseText === 'success'){
+                           // 拼接IP列表字符串
+                            var ipids = [];
+                            $.each($('#host-selector').find('.host.host-selected'),function(index, item){
+                                ipids.push($(item).attr('id').split('_')[1]*1)
+                            });
+                            // 拼接 VALUE_LIST 字符串
+                            var host_values = []
+                            $.each($('.value-list'),function(index, item){
+                                var obj = {}
+                                obj.key = $(item).attr('data-v-index');
+                                obj.value = $(item).val();
+                                obj.info = $(item).attr('data-v-info');
+                                host_values.push(obj)
+                            });
+                            // 表单序列化
+                            var form_data = $('form').serializeArray();
+                            var req_data = {};
+                            for (key in form_data){
+                                req_data[form_data[key]['name']] = form_data[key]['value']
+                            }
+                            // 删除干扰键
+                            delete req_data["search"];
+                            // 部分数据格式转换
+                            req_data['host_list'] = ipids.join(',');
+                            req_data['value_list'] = JSON.stringify(host_values);
+                            req_data['create_time'] = Math.round(new Date() / 1000)
+                            req_data['file_package_names'] = $('#file-content').find('input.file-upload').val();
+                           // 创建作业
+                           $.post("{% url 'createOrUpdateWork' %}",req_data,function(result){
+                                if(result === 'success'){
+                                    layer.msg('操作成功！',function(){
+                                        window.location.href = '/work/works';
+                                    });
+                                }else{
+                                    layer.msg('操作失败！');
+                                }
+                            });
+                       }
+                    }
+                });
+            });
+
+            layui.use('laydate', function(){
+                var laydate = layui.laydate;
+
+                //执行一个laydate实例
+                laydate.render({
+                    elem: 'input[name="time_rule"]',
+                    type: 'datetime',
+                    format: 'y,M,d,H,m,s'
+                });
+            });
+
+            var host_selector = $('.host-selector')
+            $(host_selector).change(function(){
+
+                var param = {};
+                // 判断是否获取服务器信息标志位( 三大参数不为空 )
+                var getable = true;
+                $.each(host_selector,function(index, item){
+                    if($(item).val() === ''){
+                        getable = false;
+                        param = {};
+                        return false;
+                    }
+                    param[$(item).attr('name')] = $(item).val();
+                });
+                if(getable){
+                    $('#host-selector').html('')
+                    $.post("{% url 'get_host_by_three' %}",param, function(result){
+                        var data = eval('(' + result + ')');
+                        $.each(data,function(index, item){
+                            var host_temp = '<tr id="host_' + item.id + '" class="host host-selected" onclick="toggleSelect(this);">'+
+                                                '<td>' + item.server_type + '</td>'+
+                                                '<td>' + item.IP + '</td>'+
+                                            '</tr>';
+                            $('#host-selector').append(host_temp);
+                        });
+                    });
+                }
+            });
+
+            var wid = {{ work.id | default:-1 }};
+            if(wid === -1){
+                $.post("{% url 'getPublicParameterKeywordReq' %}",{keyword : 'work_param'}, function(result){
+                    var data = eval("(" + result + ")");
+                    $.each(JSON.parse(data.confV),function(index, item){
+                        item = item.toString().split(',')
+                        var param_temp =
+                            '<div class="form-group">'+
+                                '<label class="col-lg-3 col-md-3 col-sm-12 control-label">' + item[1] + '</label>'+
+                                '<div class="col-lg-9 col-md-9">'+
+                                    '<input type="text" data-v-index="' + index + '" data-v-info="' + item[1] + '" class="value-list form-control left-icon" placeholder="请输入参数" value="' + item[0] + '">'+
+                                    '<i class="fa-dollar s16 left-input-icon"></i>'+
+                                '</div>'+
+                            '</div>';
+                        $('#work-param').append(param_temp);
+                    });
+                });
+            }
+
+            $('#title-btn').click(function(){
+                window.history.back()
+            });
+
+        });
+
+    </script>
+
+{% endblock %}

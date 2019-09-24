@@ -1,0 +1,266 @@
+{% extends 'frame.html' %}
+{% load filter %}
+
+{% block css %}
+
+    <link href="/static/css/runWork.css" rel="stylesheet" />
+
+    <style type="text/css">
+
+        #log-content {
+            width: 100%;
+            height: 500px;
+            background: #000;
+            color: #fff;
+            padding: 8px 12px;
+            line-height: 1.8em;
+            font-family: '宋体',serif;
+            font-size: medium;
+            overflow-y: scroll;
+        }
+
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+    <div class="row">
+        <!-- Start .row -->
+        <!-- Start .page-header -->
+        <div class="col-lg-12 heading">
+            <h1 class="page-header"><i class="im-users"></i> 执行发布</h1>
+            <button type="button" class="btn btn-primary" id="title-btn" title="返回"><i class="im-undo"></i>&nbsp; 返回</button>
+
+
+        </div>
+        <!-- End .page-header -->
+    </div>
+    <!-- End .row -->
+    <div class="outlet">
+    <!-- Start .outlet -->
+    <form  class="form-horizontal" role="form">
+        <!-- Page start here ( usual with .row ) -->
+        <div class="row" id="user-group-container">
+
+            <div class="col-lg-4 col-md-5 col-sm-12 col-xs-12 form-content" style="border-right: dashed 2px #ddd">
+
+                <div class="form-group">
+                    <label class="col-lg-3 col-md-2 col-sm-12 control-label">任务名称</label>
+                    <div class="col-lg-9 col-md-9">
+                        <span class="form-text">{{ work.work_name }}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 col-md-3 col-sm-12 control-label">执行状态</label>
+                    <div class="col-lg-9 col-md-9">
+                        <span class="form-text" id="work-status">{{ work.work_status }}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 col-md-3 col-sm-12 control-label">执行环节</label>
+                    <div class="col-lg-9 col-md-9">
+                        <span class="form-text">{{ work.work_type }}环境</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 col-md-3 col-sm-12 control-label">执行方式</label>
+                    <div class="col-lg-9 col-md-9">
+                        <span class="form-text">{{ work.run_way }}</span>
+                    </div>
+                </div>
+
+
+
+
+                <div class="form-group">
+                    <label class="col-lg-3 col-md-3 col-sm-12 control-label">已选服务器</label>
+                    <div class="col-lg-9 col-md-9">
+                        <input type="hidden" name="host_list">
+                        <div class="panel panel-default" style="border: solid 1px #e4e9eb;">
+                            <div class="panel-body" style="border: none;padding: 0;">
+                                <table class="table">
+                                    <thead style="background: #e4e9eb;">
+                                    <tr>
+                                        <th>服务器类型</th>
+                                        <th>IP地址</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="host-selector">
+                                    <tr id="empty">
+                                        <td colspan="2" align="center">暂无数据</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 col-md-3 col-sm-12 control-label">参数</label>
+                    <div class="col-lg-9 col-md-9">
+                        <input type="hidden" name="host_list">
+                        <div class="panel panel-default" style="border: solid 1px #e4e9eb;">
+                            <div class="panel-body" style="border: none;padding: 0;">
+                                <table class="table">
+                                    <thead style="background: #e4e9eb;">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for param in work.value_list %}
+
+                                        <tr>
+                                            <td>{{ param.info }}</td>
+                                            <td>{{ param.value }}</td>
+                                        </tr>
+
+                                    {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6 form-content log-content">
+
+                <div class="panel panel-default">
+                    <!-- Start .panel -->
+                    <div class="panel-heading">
+                        <h4 class="panel-title" style="line-height: 28px">执行日志</h4>
+                        <div class="panel-heading-content">
+                            <select class="form-control input-sm" id="reflash" style="width: 40%;" >
+                                <option value="handle">手动刷新</option>
+                                <option value="5" selected>定时 5 秒</option>
+                                <option value="20">定时 20 秒</option>
+                                <option value="60">定时 1 分钟</option>
+                            </select>
+                        </div>
+
+                        <h4 class="panel-title" style="line-height: 28px">日志过滤</h4>
+                        <div class="panel-heading-content">
+                            <select class="form-control input-sm" id="log_filter" style="width: auto;">
+                                <option value="192.168.43.212">192.168.43.212</option>
+                                <option value="192.168.43.224">192.168.43.224</option>
+                                <option value="192.168.43.188">192.168.43.188</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="panel-body gray-bg">
+                        <pre id="log-content" readonly>暂无日志</pre>
+                    </div>
+
+
+
+                </div>
+
+            </div>
+            <!-- End .outlet -->
+        </div>
+
+    </form>
+
+{% endblock %}
+
+{% block js %}
+
+    <script type="text/javascript">
+
+        function get_ips(temp_id){
+            $('#host-selector').html('');
+            $.post("{% url 'get_tempips' %}",{'temp_id' : temp_id}, function(result){
+                var data = eval('(' + result + ')');
+                $.each(data.ips,function(index, item){
+                    var host_temp = '<tr id="host_' + item.id + '">'+
+                        '<td>APP</td>'+
+                        '<td>' + item.app_ip + '</td>'+
+                        '</tr>';
+                    $('#host-selector').append(host_temp);
+                });
+            });
+        }
+
+        function get_log(){
+            $.ajax({
+                url:"/environment/view_log/?work_id=" + {{ work.id }},
+                success:function (result) {
+                    console.log("ww" + result)
+                    var logContent = $('#log-content');
+                    logContent.html('正在获取日志...');
+
+                    var response_data = eval("(" + result + ")");
+                    var log = JSON.parse(response_data.log);
+                    $('#work-status').text(response_data.work_status);
+                    if (log != "") {
+                        $(logContent).html(log);
+                        var logc = document.getElementById('log-content');
+                        logc.scrollTop = logc.scrollHeight;
+                    };
+                    
+                    if (response_data.work_status !== '执行中'){
+                        if(interval_instance !== null){
+                            clearInterval(interval_instance);
+                        };
+                        $('#reflash').attr('disabled');
+                    };
+                }
+            });
+        }
+
+        $(document).ready(function(){
+            window.interval_instance = null;
+            var temp_id = "{{ work.temp_id }}";
+            $('select[name="temp_id"]').val(temp_id);
+            if(temp_id !== ''){
+                get_ips(temp_id);
+            }
+            get_log();
+            if ("{{ work.work_status }}" === '执行中'){
+                interval_instance = setInterval(function(){
+                    get_log();
+                }, 5000);
+                $('#reflash').removeAttr('disabled');
+            }else{
+                $('#reflash').attr('disabled','disabled');
+            }
+
+            $('#title-btn').click(function(){
+                window.location.href = '{% url "issue" %}'
+            });
+
+            $('#reflash').change(function(){
+                var value = $(this).val();
+                if(value !== 'handle'){
+                    if(interval_instance !== null){
+                        clearInterval(interval_instance);
+                    }
+                    interval_instance = setInterval(function(){
+                        get_log();
+                    }, value*1000);
+                }else{
+                    if(interval_instance !== null){
+                        clearInterval(interval_instance);
+                    }
+                }
+            });
+        });
+
+    </script>
+
+{% endblock %}

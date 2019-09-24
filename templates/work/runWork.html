@@ -1,0 +1,206 @@
+{% extends 'frame.html' %}
+{% load filter %}
+
+{% block css %}
+
+    <link href="/static/css/runWork.css" rel="stylesheet" />
+
+    <style type="text/css">
+
+        #log-content {
+            width: 100%;
+            height: 500px;
+            background: #000;
+            color: #fff;
+            padding: 8px 12px;
+            line-height: 1.8em;
+            font-family: '宋体';
+            font-size: medium;
+            overflow-y: scroll;
+        }
+
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+                <div class="row">
+                    <!-- Start .row -->
+                    <!-- Start .page-header -->
+                    <div class="col-lg-12 heading">
+                        <h1 class="page-header"><i class="im-users"></i> 执行作业</h1>
+                        <button type="button" class="btn btn-primary" id="title-btn" title="返回"><i class="im-undo"></i>&nbsp; 返回</button>
+
+
+                    </div>
+                    <!-- End .page-header -->
+                </div>
+                <!-- End .row -->
+                <div class="outlet">
+                    <!-- Start .outlet -->
+                    <form  class="form-horizontal" role="form">
+                        <!-- Page start here ( usual with .row ) -->
+                        <div class="row" id="user-group-container">
+
+                            <div class="col-lg-4 col-md-5 col-sm-12 col-xs-12 form-content" style="border-right: dashed 2px #ddd">
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">平台</label>
+                                    <div class="col-lg-5 col-md-10">
+                                        <span class="form-text">{{ work.platform }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">省市</label>
+                                    <div class="col-lg-5 col-md-10">
+                                        <span class="form-text">{{ work.province }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">项目</label>
+                                    <div class="col-lg-5 col-md-10">
+                                        <span class="form-text">{{ work.project }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">作业名称</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <span class="form-text">{{ work.work_name }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">作者</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <span class="form-text">{{ work.run_user }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">描述</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <span class="form-textarea">
+                                            {{ work.work_info }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">执行方式</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <span class="form-text">{{ work.runway | translate_flag:'runway' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">定时规则</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <span class="form-text">{{ work.time_rule | default:'-' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">文件压缩包</label>
+                                    <div class="col-lg-5 col-md-5">
+                                        <span class="form-text">{{ work.file_package_names }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">执行服务器</label>
+                                    <div class="col-lg-8 col-md-8">
+                                        {% for ip in work.host_list %}
+                                            <span class="label label-primary mr10 mb10">{{ ip }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 col-md-2 col-sm-12 control-label">当期状态</label>
+                                    <div class="col-lg-10 col-md-10">
+                                        <span class="form-text" id="work-status">{{ work.work_status | translate_flag:'work_status' }}</span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6 form-content log-content">
+
+                                <div class="panel panel-default">
+                                    <!-- Start .panel -->
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">日志</h4>
+                                        <a class="btn btn-success btn-xs" id="view_log" style="margin-top: 8px;">看日志</a>
+                                    </div>
+                                    <div class="panel-body gray-bg">
+                                        <div id="log-content" readonly></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- End .outlet -->
+                        </div>
+
+                    </form>
+
+{% endblock %}
+
+{% block js %}
+
+    <script type="text/javascript">
+
+        function ex_log(log){
+            $.each(log,function(index, item){
+                $('#log-content').append("<div>" + index + "机器日志：<br/><div>");
+                $.each(item,function(key, val){
+                    logContent = $('#log-content');
+                    $(logContent).append("<div>" + val + "<br/></div>");
+                    $(logContent[0]).scrollTop(item.scrollHeight);
+                });
+            });
+        }
+
+        $(document).ready(function(){
+
+            $('#view_log').click(function(){
+                workid = {{ work.id | default:-1 }};
+                work_status = {{ work.work_status | default:0 }};
+                uri = "ws://" + window.location.host + "/work/get_log/?work_id=" + workid;
+                socket = new WebSocket(uri);
+                socket.onopen = function(){
+                };
+                socket.onerror = function(e){
+                    console.log('ERROR:' + e.data);
+                }
+                socket.onmessage = function (e) {
+                    $('#log-content').html('');
+                    response_data = eval("(" + e.data + ")");
+                    log = eval("(" + response_data.log + ")");
+                    work_status = '未开始,执行中,执行成功,执行中断,执行异常'.split(',');
+                    $('#work-status').text(work_status[response_data.work_status]);
+                    ex_log(log, function(){
+                        layer.msg('数据解析结束')
+                    });
+                    if (response_data.work_status!=1){
+                        socket.close()
+                    }
+                };
+
+                socket.onclose = function(e){
+                    console.log('WebSocket is closed!');
+                };
+            });
+
+            $('#title-btn').click(function(){
+                window.location.href = '{% url "works" %}'
+            });
+        });
+
+    </script>
+
+{% endblock %}

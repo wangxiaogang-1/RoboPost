@@ -1,0 +1,335 @@
+{% extends 'frame.html' %}
+{% load filter %}
+
+{% block css %}
+
+    <link href="/static/css/work.css" rel="stylesheet" />
+    <link href="/static/css/config.css" rel="stylesheet" />
+    <link href="/static/assets/plugins/layui/css/layui.css" rel="stylesheet" />
+    <style>
+        .file-upload {
+            display: none;
+        }
+        #files-preview {
+            height: 15em;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            border: solid 1px #eee;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+
+        <div class="row">
+
+            <div class="col-lg-12 heading">
+
+                <h1 class="page-header"><i class="im-users"></i> 配置信息</h1>
+
+                <button type="button" class="btn btn-primary" id="title-btn" title="返回"><i class="im-undo"></i>&nbsp; 返回</button>
+
+            </div>
+        </div>
+
+        <div class="outlet">
+            <!-- Start .outlet -->
+            <!-- Page start here ( usual with .row ) -->
+            <div class="row">
+
+                <form id="temp-form">
+
+                    {% if operate == 'U' or operate == 'V' %}
+
+                        <input type="hidden" name="id" value="{{ dat.temp.0.id }}">
+
+                    {% endif %}
+
+                    <div class="col-lg-3" style="margin: 20px 0;">
+
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-12 control-label" style="line-height: 32px;"> {% if request.session.user.is_superuser and operate == 'C' %}选择系统{% else %}系统名称{% endif %}</label>
+                            <div class="col-lg-9 col-md-9">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12">
+                                        <input type="hidden" name="belong_sys" value="{% if dat.temp.0.belong_sys == None %}{{ user_group }}{% else %}{{ dat.temp.0.belong_sys }}{% endif %}">
+                                        <select class="form-control form-selector" check {% if not request.session.user.is_superuser or operate == 'U' or operate == 'V' %}disabled{% endif %}>
+                                            <option value=""><-- 请选择系统 --></option>
+                                            {% for sys in systems %}
+                                                <option value="{{ sys }}" {% if dat.temp.0.belong_sys == sys or user_group == sys %}selected{% endif %}>{{ sys }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3" style="margin: 20px 0;">
+
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-12 control-label" style="line-height: 32px;">发布环节</label>
+                            <div class="col-lg-9 col-md-9">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12">
+                                        <input type="hidden" name="temp_type" value="{{ dat.temp.0.temp_type }}">
+                                        <select class="form-control form-selector" check {% if operate == 'U' or operate == 'V' %}disabled{% endif %}>
+                                            <option value=""><-- 请选择系发布环节 --></option>
+                                            <option value="测试" {% if dat.temp.0.temp_type == '测试' %}selected{% endif %}>测试</option>
+                                            <option value="UAT测试" {% if dat.temp.0.temp_type == 'UAT测试' %}selected{% endif %}>UAT测试</option>
+                                            <option value="预生产" {% if dat.temp.0.temp_type == '预生产' %}selected{% endif %}>预生产</option>
+                                            <option value="生产" {% if dat.temp.0.temp_type == '生产' %}selected{% endif %}>生产</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3" style="margin: 20px 0;">
+
+                        <div class="form-group">
+                            <label class="col-lg-3 col-md-3 col-sm-12 control-label" style="line-height: 32px;">模板名称</label>
+                            <div class="col-lg-9 col-md-9">
+                                <input type="text" class="form-control" check name="temp_name" value="{{ dat.temp.0.temp_name }}" placeholder="请填写模板名称" {% if operate == 'V' %}disabled{% endif %}>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {% if operate == 'V' %}disabled{% endif %}
+
+                    <div class="col-lg-1" style="margin: 20px 0;">
+
+                        <div class="form-group">
+                            <div class="col-lg-9 col-md-9">
+                                <button type="button" class="btn btn-success" id="save-temp" title="保存修改"><i class="im-box-add"></i>&nbsp; 保存</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-12">
+                        <!-- Start col-lg- 3 -->
+                        <div class="panel panel-default" data-id="apps">
+                            <!-- Start .panel -->
+                            <div class="panel-heading">
+                                <h4 class="panel-title">应用服务器</h4>
+                                <div class="panel-heading-content">
+
+                                    <a class="btn btn-success btn-xs add" title="新增应用服务器配置信息" {% if operate == 'V' %}disabled{% endif %}><i class="im-plus"></i>&nbsp;新增</a>
+
+                                </div>
+                            </div>
+                            <div class="panel-body" id="apps">
+
+                                {% for item in dat.app %}
+
+                                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 card-item" data-id="{{ item.id }}" data-index="{{ forloop.counter0 }}">
+                                        <div class="tile-stats b brall mb25">
+                                            <div hidden class="controls" id="controls">
+                                                {% if operate == 'V' %}
+                                                    <button type="button" class="btn btn-primary btn-xs btn-round btn-control control-view" data-operate="V" title="查看模板"><i class="im-eye"></i></button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-warning btn-xs btn-round btn-control control-modify update" data-operate="U"><i class="en-pencil"></i></button>
+                                                    <button type="button" class="btn btn-danger btn-xs btn-round btn-control control-del"><i class="en-cross"></i></button>
+                                                {% endif %}
+                                            </div>
+                                            <a>
+                                                <div class="tile-stats-icon">
+                                                    <i class="st-file-settings color-green"></i>
+                                                </div>
+                                                <div class="tile-stats-content">
+                                                    <div class="tile-stats-number proj-name" style="font-size: 18px;line-height: 32px;">{{ item.app_ip }}</div>
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                {% empty %}
+
+                                    <span>暂无数据</span>
+
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+            <!-- End .row -->
+            <!-- Page End here -->
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/assets/plugins/layui/layui.js"></script>
+    <script src="/static/plugins/layer/layer.js"></script>
+
+    <script>
+
+        var host_id = -1, content_id = -1;
+
+        function popup(prop){
+            layer.open({
+                type: 2,
+                area: ['45%', '75%'],
+                title : prop.title,
+                content: prop.url
+            });
+        }
+
+        function bind_fun(){
+            $('#save-temp').click(function(){
+                var temp_dat = JSON.stringify($('#temp-form').serializeArray()),
+                    checkr = apstool.prosecutor.check_formEmpty(temp_dat);
+                temp_dat = JSON.stringify(autoops.getValueTool('formatJSONArray')(JSON.parse(temp_dat)));
+                if(!checkr){
+                    $.post('{% url "create_temp_view" %}',{temp : temp_dat , operate : "{{ operate }}" }, function(result){
+                        if(result === 'success'){
+                            layer.msg('保存成功！',function(){
+                                window.location.href = '{% url "configs" %}';
+                            });
+                        }
+                    });
+                }else{
+                    layer.msg('检测到有非法字段！');
+                }
+            });
+
+            $(".card-item").unbind('hover')
+                .hover(function(){
+                    $(this).find(".controls").show();
+                    // layer.tips($(this).children('.details').html(), this, {tips : 1});
+                },function(){
+                    $(this).find(".controls").hide();
+                });
+
+            $('#title-btn').unbind('click').click(function(){
+                window.history.back()
+            });
+
+            var ope_param = {
+                apps : {
+                    name : '应用',
+                    addOrUpdate : {
+                        url : '{% url "cou_appserver_config" %}'
+                    },
+                    del : {
+                        url : '/conf/deleteHostInfo/'
+                    }
+                },
+                dbs : {
+                    name : '数据库',
+                    addOrUpdate : {
+                        url : '/conf/createOrUpdateDbServerConfig/'
+                    },
+                    del : {
+                        url : '/conf/deleteDbInfo/'
+                    }
+                }
+            };
+            $('.add').unbind('click').click(function(){
+                var checklist = JSON.stringify($('#form').serializeArray()),
+                    ope_type = $(this).parents('.panel').attr('data-id'),
+                    checkResult = apstool.prosecutor.check_formEmpty(checklist);
+                console.log(checklist);
+                if (!checkResult){
+                    layer.open({
+                        type: 2,
+                        area: ['35%', '75%'],
+                        title : '创建' + ope_param[ope_type].name + '服务器配置',
+                        content: ope_param[ope_type].addOrUpdate.url + '?operate=C'
+                    });
+                }else {
+                    layer.msg("配置信息有未检查的空值！");
+                }
+
+            });
+
+            $('.update,.control-view').unbind('click').click(function(){
+                var checklist = [
+                        $('input[name="temp_name"]').val(),
+                        $('select[name="belong_sys"]').val(),
+                        $('select[name="temp_type"]').val()
+                    ],
+                    ope_type = $(this).parents('.panel').attr('data-id');
+                var temp_id = "{{ dat.temp.0.id }}" | $('#temps').val();
+                layer.open({
+                    type: 2,
+                    area: ['35%', '75%'],
+                    title : '更新' + ope_param[ope_type].name + '服务器配置',
+                    content: ope_param[ope_type].addOrUpdate.url + '?operate=' + $(this).attr('data-operate') + '&app_id=' + $(this).parents('.card-item').attr('data-id') + '&temp_id=' + temp_id
+                });
+            });
+
+            $('.control-del').unbind('click').click(function(){
+                var id = $(this).parents('.card-item').attr('data-id');
+                layer.confirm('<span style="color: #e33">确定删除该配置？</span>',function(){
+                    $.post("{% url 'del_app' %}",{app_id : id}, function(result){
+                        var msg = '操作失败！';
+                        result === 'success' ? msg = '已删除该项目！' : function(){};
+                        layer.msg(msg, function(){
+                            window.location.reload();
+                        });
+                    });
+                });
+            });
+        }
+
+        (function(){
+
+            $('[name="temps"]').change(function(){
+                var id = $(this).val();
+                if(id !== ""){
+                    $.post('{% url "get_taserver" %}', {'temp_id' : id}, function(result){
+                        var data = eval("(" + result + ")");
+                        $('#apps').html("");
+                        $.each(data.apps , function(index, item){
+                            var tempelate = '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 card-item" data-id="' + item.id + '" data-index="' + index + '">\n' +
+                                '                                    <div class="tile-stats b brall mb25">\n' +
+                                '                                        <div hidden class="controls">\n' +
+                                '                                            <button type="button" class="btn btn-warning btn-xs btn-round btn-control control-modify update"><i class="en-pencil"></i>\n' +
+                                '                                            </button>\n' +
+                                '                                            <button type="button" class="btn btn-danger btn-xs btn-round btn-control control-del"><i class="en-cross"></i>\n' +
+                                '                                            </button>\n' +
+                                '                                        </div>\n' +
+                                '                                        <a>\n' +
+                                '                                            <div class="tile-stats-icon">\n' +
+                                '                                                <i class="st-file-settings color-green"></i>\n' +
+                                '                                            </div>\n' +
+                                '                                            <div class="tile-stats-content">\n' +
+                                '                                                <div class="tile-stats-number proj-name" style="font-size: 18px;line-height: 32px;">' + item.app_ip + '</div>\n' +
+                                '                                            </div>\n' +
+                                '                                            <div class="clearfix"></div>\n' +
+                                '                                        </a>\n' +
+                                '                                    </div>\n' +
+                                '                                </div>';
+                            $('#apps').append(tempelate);
+                        });
+                        bind_fun();
+                    });
+                }else{
+                    $('#apps').html("<span>暂无数据</span>");
+                }
+            });
+            bind_fun();
+
+        })();
+
+
+    </script>
+
+{% endblock %}

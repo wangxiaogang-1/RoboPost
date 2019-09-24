@@ -1,0 +1,308 @@
+{"date":"2018-08-23 01:33:25","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 01:33:26","level":"ERROR","path":"exception.handle_uncaught_exception:135","Internal Server Error: /auth/auth_login/"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 101, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 166, in execute
+    result = self._query(query)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 856, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1057, in _read_query_result
+    result.read()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1340, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1014, in _read_packet
+    packet.check_error()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 393, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'robopost.authManage_module' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/wlgma/install_package/RoboPost/authManage/views.py", line 23, in auth_login
+    return HttpResponse(service.auth_login(request))
+  File "/home/wlgma/install_package/RoboPost/authManage/service.py", line 433, in auth_login
+    modules = getUserModules(user_msg)
+  File "/home/wlgma/install_package/RoboPost/authManage/service.py", line 456, in getUserModules
+    q_module = queryset_transducer(Module.objects.filter(codename=permission['codename']).values())
+  File "/home/wlgma/install_package/RoboPost/tool/data_tool.py", line 6, in queryset_transducer
+    for item in queryset:
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 250, in __iter__
+    self._fetch_all()
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 1118, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 106, in __iter__
+    for row in compiler.results_iter():
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 836, in results_iter
+    results = self.execute_sql(MULTI)
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 894, in execute_sql
+    raise original_exception
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 884, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 101, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 166, in execute
+    result = self._query(query)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 856, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1057, in _read_query_result
+    result.read()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1340, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1014, in _read_packet
+    packet.check_error()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 393, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.ProgrammingError: (1146, "Table 'robopost.authManage_module' doesn't exist")
+{"date":"2018-08-23 01:33:26","level":"ERROR","path":"basehttp.log_message:124",""POST /auth/auth_login/ HTTP/1.1" 500 20141"}
+{"date":"2018-08-23 01:33:31","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 01:33:31","level":"ERROR","path":"exception.handle_uncaught_exception:135","Internal Server Error: /auth/auth_login/"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 101, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 166, in execute
+    result = self._query(query)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 856, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1057, in _read_query_result
+    result.read()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1340, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1014, in _read_packet
+    packet.check_error()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 393, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'robopost.authManage_module' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/wlgma/install_package/RoboPost/authManage/views.py", line 23, in auth_login
+    return HttpResponse(service.auth_login(request))
+  File "/home/wlgma/install_package/RoboPost/authManage/service.py", line 433, in auth_login
+    modules = getUserModules(user_msg)
+  File "/home/wlgma/install_package/RoboPost/authManage/service.py", line 456, in getUserModules
+    q_module = queryset_transducer(Module.objects.filter(codename=permission['codename']).values())
+  File "/home/wlgma/install_package/RoboPost/tool/data_tool.py", line 6, in queryset_transducer
+    for item in queryset:
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 250, in __iter__
+    self._fetch_all()
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 1118, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 106, in __iter__
+    for row in compiler.results_iter():
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 836, in results_iter
+    results = self.execute_sql(MULTI)
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 894, in execute_sql
+    raise original_exception
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 884, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 101, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 166, in execute
+    result = self._query(query)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 856, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1057, in _read_query_result
+    result.read()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1340, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1014, in _read_packet
+    packet.check_error()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 393, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.ProgrammingError: (1146, "Table 'robopost.authManage_module' doesn't exist")
+{"date":"2018-08-23 01:33:31","level":"ERROR","path":"basehttp.log_message:124",""POST /auth/auth_login/ HTTP/1.1" 500 20141"}
+{"date":"2018-08-23 01:45:34","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 01:45:35","level":"ERROR","path":"exception.handle_uncaught_exception:135","Internal Server Error: /auth/auth_login/"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 101, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 166, in execute
+    result = self._query(query)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 856, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1057, in _read_query_result
+    result.read()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1340, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1014, in _read_packet
+    packet.check_error()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 393, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'robopost.authManage_module' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/usr/local/lib/python3.6/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/wlgma/install_package/RoboPost/authManage/views.py", line 23, in auth_login
+    return HttpResponse(service.auth_login(request))
+  File "/home/wlgma/install_package/RoboPost/authManage/service.py", line 433, in auth_login
+    modules = getUserModules(user_msg)
+  File "/home/wlgma/install_package/RoboPost/authManage/service.py", line 456, in getUserModules
+    q_module = queryset_transducer(Module.objects.filter(codename=permission['codename']).values())
+  File "/home/wlgma/install_package/RoboPost/tool/data_tool.py", line 6, in queryset_transducer
+    for item in queryset:
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 250, in __iter__
+    self._fetch_all()
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 1118, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/query.py", line 106, in __iter__
+    for row in compiler.results_iter():
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 836, in results_iter
+    results = self.execute_sql(MULTI)
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 894, in execute_sql
+    raise original_exception
+  File "/usr/local/lib/python3.6/site-packages/django/db/models/sql/compiler.py", line 884, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/usr/local/lib/python3.6/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 101, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 166, in execute
+    result = self._query(query)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 856, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1057, in _read_query_result
+    result.read()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1340, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 1014, in _read_packet
+    packet.check_error()
+  File "/usr/local/lib/python3.6/site-packages/pymysql/connections.py", line 393, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/local/lib/python3.6/site-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.ProgrammingError: (1146, "Table 'robopost.authManage_module' doesn't exist")
+{"date":"2018-08-23 01:45:35","level":"ERROR","path":"basehttp.log_message:124",""POST /auth/auth_login/ HTTP/1.1" 500 20086"}
+{"date":"2018-08-23 01:53:52","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 01:54:15","level":"INFO","path":"views.userList:69","user"："admin","ip":"10.192.128.58","message":"进入用户模块！"}
+{"date":"2018-08-23 01:54:17","level":"INFO","path":"views.userGroupList:36","user"："admin","ip":"10.192.128.58","message":"进入用户组模块！"}
+{"date":"2018-08-23 02:07:58","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 02:08:03","level":"INFO","path":"views.userList:69","user"："admin","ip":"10.192.128.58","message":"进入用户模块！"}
+{"date":"2018-08-23 02:08:04","level":"INFO","path":"views.userGroupList:36","user"："admin","ip":"10.192.128.58","message":"进入用户组模块！"}
+{"date":"2018-08-23 02:08:05","level":"INFO","path":"views.userList:69","user"："admin","ip":"10.192.128.58","message":"进入用户模块！"}
+{"date":"2018-08-23 02:42:28","level":"INFO","path":"views.userList:69","user"："admin","ip":"10.192.128.58","message":"进入用户模块！"}
+{"date":"2018-08-23 02:42:49","level":"INFO","path":"views.auth_logout:29","user"："admin","ip":"10.192.128.58","message":"登出系统！"}
+{"date":"2018-08-23 02:42:56","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 13 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+August 23, 2018 - 01:14:52
+Django version 1.11.7, using settings 'RoboPost.settings'
+Starting development server at http://172.10.5.8:8099/
+Quit the server with CONTROL-C.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{"date":"2018-08-23 03:03:07","level":"INFO","path":"views.userGroupList:36","user"："wangnanfei","ip":"10.192.128.58","message":"进入用户组模块！"}
+{"date":"2018-08-23 03:03:09","level":"INFO","path":"views.userList:69","user"："wangnanfei","ip":"10.192.128.58","message":"进入用户模块！"}
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 13 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+August 23, 2018 - 02:54:04
+Django version 1.11.7, using settings 'RoboPost.settings'
+Starting development server at http://172.10.5.8:8099/
+Quit the server with CONTROL-C.
+{"date":"2018-08-23 03:18:44","level":"INFO","path":"views.auth_logout:29","user"："wangnanfei","ip":"10.192.128.58","message":"登出系统！"}
+{"date":"2018-08-23 03:18:49","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 03:18:59","level":"INFO","path":"views.auth_logout:29","user"："admin","ip":"10.192.128.58","message":"登出系统！"}
+{"date":"2018-08-23 03:19:11","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 03:25:08","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}
+{"date":"2018-08-23 03:25:21","level":"INFO","path":"views.auth_logout:29","user"："admin","ip":"10.192.128.58","message":"登出系统！"}
+{"date":"2018-08-23 03:25:26","level":"INFO","path":"views.auth_login:22","user"："","ip":"10.192.128.58","message":"登录系统！"}

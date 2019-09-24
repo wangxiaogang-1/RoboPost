@@ -1,0 +1,60 @@
+/*
+
+    style for configMsg.html in conf Manage
+
+*/
+
+.data-list {
+    padding: 5px 10px;
+}
+
+.data-list >  h5 {
+    font-size: 1.4em;
+}
+
+.data-list > ul {
+    list-style-type: none;
+    padding: 1.5em 3.5em;
+}
+
+.data-list > ul > li{
+    display: inline-block;
+    margin: 20px 0;
+}
+
+.data-list > ul > li > span{
+    font-size: 1.2em;
+}
+
+.data-list > ul > li > .field-name{
+    font-weight: bold;
+}
+
+.data-list > ul > li > .field-name:after{
+    content: ':';
+    padding: 0 8px;
+}
+
+.data-list > ul > li > .field-value {
+    margin: 0 3em 0 0;
+    color: #3E87E3;
+}
+
+.data-list-title {
+    /*background-color: #5fc0ea;*/
+}
+
+.data-list-title > h5,
+.data-list-title > .operator{
+    display: inline-block;
+}
+
+.data-list-title > .operator{
+    position: absolute;
+    line-height: 32px;
+    right: 2.5em;
+}
+
+.panel.main-panel > .panel-body {
+    min-height: 45em;
+}

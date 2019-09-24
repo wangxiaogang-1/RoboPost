@@ -1,0 +1,187 @@
+{%load filter%}
+
+<table class="table table-hover display" id="dt">
+    <thead>
+    <tr>
+        <th>系统</th>
+        <th>任务名称</th>
+        <th>版本号</th>
+        <th>发布环节</th>
+        <th>执行方式</th>
+        <th>开始时间</th>
+        <th>结束时间</th>
+        <th>耗时</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="data-content">
+
+    {% for work in works %}
+        <tr class="odd gradeX work-info" id="work_{{ work.id }}">
+            <td class="publish_way" hidden>{{ work.publish_way }}</td>
+            <td>{{ work.belong_sys }}</td>
+            <td >{{ work.work_name }}</td>
+            <td>{{ work.version | translate_none }}</td>
+            <td class="work_type">{{ work.work_type | translate_none }}</td>
+            <td>{{ work.run_way }}</td>
+            <td>{{ work.start_time | parse_timestamp }}</td>
+            <td>{{ work.end_time | parse_timestamp }}</td>
+            <td>{{ work.start_time | sub_timestamp:work.end_time }}</td>
+            <td>{{ work.work_status }}</td>
+            <td>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="font-size: large;cursor: pointer;text-align: right;">
+
+                    {% if work.work_status == '未开始' %}
+
+                        <i class="im-play3 text-success run" data-id="{{ work.id }}" title="执行"></i>&nbsp;
+                        <i class="im-pencil text-warning update" data-id="{{ work.id }}" title="修改"></i>&nbsp;
+                        <i class="im-remove2 text-danger delete" data-id="{{ work.id }}" title="删除"></i>&nbsp;
+
+                    {% endif %}
+
+                    {% if work.work_status == '执行中' or work.work_status == '执行成功' or work.work_status == '执行异常' or work.work_status == '执行中断' or work.work_status == '回退成功' or work.work_status == '无更新' %}
+
+                        <i class="im-eye text-primary review" data-id="{{ work.id }}" title="查看"></i>&nbsp;
+
+                    {% endif %}
+
+                    {% if work.work_status == '执行中' %}
+
+                        <i class="im-stop2 text-dark stop" data-id="{{ work.id }}" title="中断"></i>&nbsp;
+
+                    {% endif %}
+
+                    {% if work.work_status == '执行成功' %}
+
+                        <i class="im-undo text-dark rollback" data-id="{{ work.id }}" title="回滚"></i>&nbsp;
+
+                    {% endif %}
+
+                </div>
+            </td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
+
+<script src="/static/assets/plugins/tables/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/tables/datatables/jquery.dataTablesBS3.js"></script>
+<script src="/static/assets/plugins/tables/datatables/tabletools/ZeroClipboard.js"></script>
+<script src="/static/assets/plugins/tables/datatables/tabletools/TableTools.js"></script>
+<script src="/static/assets/js/pages/data-tables.js"></script>
+
+<script>
+
+    function bind_fun(){
+
+        $('.run').click(function(){
+            var that = this;
+            // 检测作业可执行状态
+            $.post('{% url "check_run" %}',{work_id : $(that).attr('data-id')},function(result){
+                if (result.indexOf(':') !== -1){
+                    var error_msg = result.split(':')[1];
+                    layer.msg(error_msg)
+                }else{
+                    window.location.href = '{% url 'run_issue' %}?menu=issue&work_id=' + $(that).attr('data-id');
+                }
+            });
+        });
+
+        $('.stop').click(function(){
+            var that = this;
+            $.post("{% url 'kill_issue' %}",{work_id : $(that).attr('data-id')},function(result){
+                layer.msg('作业已停止执行！',function(){
+                    window.location.reload()
+                });
+            });
+        });
+
+        $('.rollback').click(function(){
+            var that = this;
+            window.location.href = '{% url 'roll_back_view' %}?menu=issue&work_id=' + $(that).attr('data-id');
+        });
+
+        $('.review').click(function(){
+            window.location.href = '{% url 'view_work_env' %}?menu=issue&work_id=' + $(this).attr('data-id');
+        });
+
+        $('.update').click(function(){
+            var env = $(this).parents('.work-info').find('.work_type').text().trim();
+            window.location.href = '{% url "update_issue" %}?menu=issue&work_id=' + $(this).attr('data-id') + '&env=' + env;
+        });
+
+        $('.delete').click(function(){
+            var that = this;
+            layer.confirm('确定删除作业记录？',function(){
+                $.post("{% url 'del_work' %}",{work_id : $(that).attr('data-id')}, function(result){
+                    if(result === 'success'){
+                        layer.msg('已删除该作业！', function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        layer.msg('操作失败，请重试！');
+                    }
+                });
+            });
+        });
+
+    }
+
+    $(document).ready(function(){
+
+        var table = $('#dt').dataTable({
+            "bSort": false,
+            "sPaginationType": "bs_full",
+            "fnPreDrawCallback": function( oSettings ) {
+                // $('.dataTables_filter').remove();
+                    $('.dataTables_filter input').addClass('form-control input-large').attr('placeholder', '请输入搜索关键字');
+                    $('.dataTables_length select').addClass('form-control input-small');
+            },
+            "oLanguage": {
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "searching" : true,
+                "sUrl": "",
+                "sEmptyTable": "暂无数据",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,9,10 ] }],
+            "bJQueryUI": false,
+            "odering" : false,
+            "bAutoWidth": false,
+            "sDom": "<'row'<'col-lg-3 col-md-3 col-sm-12 text-right'l><'col-lg-9 col-md-9 col-sm-12 text-right' f>r>t<'row-'<'col-lg-6 col-md-6 col-sm-12'i><'col-lg-6 col-md-6 col-sm-12'p>>",
+            "oTableTools": {
+                "sSwfPath": "/static/assets/plugins/tables/datatables/tabletools/swf/copy_csv_xls_pdf.swf",
+                "aButtons": [
+
+                ]
+            }
+        });
+
+        table.on( 'draw', function () {
+            bind_fun();
+        });
+
+    });
+
+</script>

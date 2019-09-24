@@ -1,0 +1,159 @@
+{% extends 'frame.html' %}
+
+{% block css %}
+
+    <link href="/static/css/userList.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+        <div class="row">
+            <!-- Start .row -->
+            <!-- Start .page-header -->
+            <div class="col-lg-12 heading">
+
+                <h1 class="page-header"><i class="im-user"></i> 用户管理</h1>
+
+                <button type="button" class="btn btn-success" id="title-btn" title="新增用户"><i class="im-plus"></i>&nbsp; 新增用户</button>
+
+                <!-- Start .bredcrumb -->
+                <ul id="crumb" class="breadcrumb"></ul>
+                <!-- End .breadcrumb -->
+
+            </div>
+            <!-- End .page-header -->
+        </div>
+        <!-- End .row -->
+        <div class="outlet">
+            <!-- Start .outlet -->
+            <!-- Page start here ( usual with .row ) -->
+            <div class="row">
+
+                <div class="col-lg-12 page-panel" id="table-panel">
+                    <!-- col-lg-6 start here -->
+                    <div class="panel panel-default plain toggle panelClose panelRefresh">
+                        <!-- Start .panel -->
+                        <div class="panel-heading white-bg">
+                            <h4 class="panel-title">所有用户</h4>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        <label class="checkbox">
+                                            <input type="checkbox" value="option1">
+                                        </label>
+                                    </th>
+                                    <th>用户名</th>
+                                    <th>姓名</th>
+                                    <th>上次登录时间</th>
+                                    <th>注册时间</th>
+                                    <th>身份</th>
+                                    <th>激活状态</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="userContent">
+
+                                {% for obj in users %}
+
+                                    <tr>
+                                        <td>
+                                            <label class="checkbox">
+                                                <input type="checkbox" value="option1">
+                                            </label>
+                                        </td>
+                                        <td>{{ obj.username }}</td>
+                                        <td>{{ obj.first_name }}{{ obj.last_name }}</td>
+                                        <td>{{ obj.last_login|date:"Y-m-d H:i:s"|default:"从未登录" }}</td>
+                                        <td>{{ obj.date_joined|date:"Y-m-d H:i:s" }}</td>
+                                        <td>{% if obj.is_superuser %}管理员{% else %}员工{% endif %}</td>
+                                        <td>
+                                            {% if obj.is_active %}
+                                                <span class="badge badge-success mr10 mb10">已激活</span>
+                                            {% else %}
+                                                <span class="badge badge-danger mr10 mb10">未激活</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-xs btn-warning btn-update" data-uid="{{ obj.id }}"><i class="im-pencil"></i>&nbsp;更新</button>
+                                            <button type="button" class="btn btn-xs btn-danger btn-delete" data-uid="{{ obj.id }}"><i class="im-remove2"></i>&nbsp;删除</button>
+                                        </td>
+                                    </tr>
+
+                                {% empty %}
+
+                                    <td colspan="7">抱歉，用户列表为空</td>
+
+                                {% endfor %}
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End .panel -->
+                </div>
+
+            </div>
+            <!-- End .row -->
+            <!-- Page End here -->
+        </div>
+        <!-- End .outlet -->
+    </div>
+
+
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/tools.js"></script>
+    <script type="text/javascript">
+
+        thisUserId = -1;
+
+        $(document).ready(function(){
+
+            $('#title-btn').click(function(){
+                layer.open({
+                    type: 2,
+                    area: ['45%', '75%'],
+                    title : '创建新的用户',
+                    content: '{% url "createOrUpdateUserPage" %}?opt=c&uid=-1'
+                });
+            });
+
+            $('.btn-update').click(function(){
+                var uid = $(this).attr('data-uid');
+                thisUserId = uid;
+                layer.open({
+                    type: 2,
+                    area: ['45%', '75%'],
+                    title : '更新用户',
+                    content: '{% url "createOrUpdateUserPage" %}?opt=u&uid=' + uid
+                });
+            });
+
+            $('.btn-delete').click(function(){
+                var ids = [$(this).attr('data-uid')];
+                layer.confirm('删除该用户将删除该用户与其拥有权限的关联关系，确定删除该用户？',function(){
+                    $.post("{% url 'deleteUser' %}",{ids : ids.toString()}, function(result){
+                        if(result === 'success'){
+                            layer.msg('已删除该用户！', function(){
+                                window.location.reload();
+                            });
+                        }else{
+                            layer.msg('操作失败！');
+                        }
+                    });
+                });
+            })
+
+        });
+
+    </script>
+
+{% endblock %}

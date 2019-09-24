@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加项目</title>
+    <link href="/static/assets/plugins/layui/css/layui.css" rel="stylesheet" />
+    <script src="/static/assets/plugins/layui/layui.js"></script>
+    <style>
+        #user {
+            padding: 4em 0;
+        }
+        #groups input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        input:disabled {
+            background: #eee;
+            border: solid 1px #ddd !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="layui-container">
+      <div class="layui-row">
+        <div class="layui-col-lg12 layui-col-md12 layui-col-sm12">
+          <form class="layui-form" action="" id="user">
+              <input type="hidden" name="id" value="{{ project.id }}">
+              <input type="hidden" name="confK" value="proj_type">
+              <div class="layui-form-item">
+                <label class="layui-form-label">名称</label>
+                <div class="layui-input-block">
+                  <input type="text" name="confV" value="{{ project.confV }}" required  lay-verify="required" placeholder="请输入项目名称" autofocus="true" class="layui-input" maxlength="20">
+                </div>
+              </div>
+              <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">简介</label>
+                <div class="layui-input-block">
+                  <textarea name="confI" placeholder="请输入项目简介" class="layui-textarea">{{ project.confI }}</textarea>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-input-block">
+                  <button class="layui-btn layui-btn-normal" lay-submit lay-filter="save">立即提交</button>&nbsp;
+                  <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+              </div>
+            </form>
+        </div>
+      </div>
+</div>
+</body>
+</html>
+<script src="/static/assets/js/jquery-1.8.3.min.js"></script>
+<script src="/static/js/tools.js"></script>
+<script>
+
+
+    $(document).ready(function(){
+
+        layui.use('form', function(){
+
+          layer.config({
+            skin: 'theme-default'
+          });
+
+        var form = layui.form;
+
+          form.on('submit(save)', function(data){
+                $.post("{% url 'createOrUpdatePublicParameter' %}",{data : JSON.stringify(data.field)}, function(result){
+                    layer.msg('操作成功！',function(){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index,function(){});
+                        parent.location.reload()
+                    });
+                });
+                return false;
+              });
+        });
+    })
+</script>

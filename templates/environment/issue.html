@@ -1,0 +1,189 @@
+{% extends 'frame.html' %}
+{%load filter%}
+
+{% block css %}
+
+    <link href="/static/css/mod.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-lg-12 heading">
+                <h1 class="page-header"><i class="im-users"></i> 发布</h1>
+                <ul id="crumb" class="breadcrumb"></ul>
+            </div>
+        </div>
+        <div class="outlet">
+            <div class="row" id="user-group-container">
+                <div class="col-lg-6 col-md-6" style="margin: 20px 0">
+
+                    <div class="btn-group t-btn">
+                        <button type="button" class="btn btn-lg btn-primary env-btn" style="background: rgba(82, 167, 224, 1)">测试</button>
+                        <button type="button" class="btn btn-lg btn-primary env-btn" style="background: rgba(82, 167, 224, .8)">UAT测试</button>
+                        <button type="button" class="btn btn-lg btn-primary env-btn" style="background: rgba(82, 167, 224, .6)">预生产</button>
+                        <button type="button" class="btn btn-lg btn-success env-btn">生产</button>
+                    </div>
+
+                </div>
+                <div class="col-lg-6 col-md-6" style="margin: 20px 0">
+
+                    <div class="form-group">
+                        <label class="col-lg-4 col-md-4 control-label">
+                            <div class="btn-group time-btn">
+                                <button type="button" class="btn btn-default query-time" data-time="1">今日</button>
+                                <button type="button" class="btn btn-default query-time" data-time="7">本周</button>
+                                <button type="button" class="btn btn-default query-time active" data-time="30">本月</button>
+                            </div>
+                        </label>
+                        <div class="col-lg-8 col-md-8">
+                            <div class="input-group" style="display: flex">
+                                <input type="date" name="start_time" class="form-control">
+                                <input type="date" name="end_time" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-lg-12 col-md-4 col-sm-6 col-xs-12" id="table-container">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+
+        function bind_fun(){
+
+            $('.run').click(function(){
+                var that = this;
+                // 检测作业可执行状态
+                $.post('{% url "check_run" %}',{work_id : $(that).attr('data-id')},function(result){
+                    if (result.indexOf(':') !== -1){
+                        var error_msg = result.split(':')[1];
+                        layer.msg(error_msg)
+                    }else{
+                        window.location.href = '{% url 'run_issue' %}?menu=issue&work_id=' + $(that).attr('data-id');
+                    }
+                });
+            });
+
+            $('.stop').click(function(){
+                var that = this;
+                $.post("{% url 'kill_issue' %}",{work_id : $(that).attr('data-id')},function(result){
+                    layer.msg('作业已停止执行！',function(){
+                        window.location.reload()
+                    });
+                });
+            });
+
+            $('.rollback').click(function(){
+                var that = this;
+                window.location.href = '{% url 'roll_back_view' %}?menu=issue&work_id=' + $(that).attr('data-id');
+            });
+
+            $('.review').click(function(){
+                window.location.href = '{% url 'view_work_env' %}?menu=issue&work_id=' + $(this).attr('data-id');
+            });
+
+            $('.update').click(function(){
+                var env = $(this).parents('.work-info').find('.work_type').text().trim();
+                window.location.href = '{% url "update_issue" %}?menu=issue&work_id=' + $(this).attr('data-id') + '&env=' + env;
+            });
+
+            $('.delete').click(function(){
+                var that = this;
+                layer.confirm('确定删除作业记录？',function(){
+                    $.post("{% url 'del_work' %}",{work_id : $(that).attr('data-id')}, function(result){
+                        if(result === 'success'){
+                            layer.msg('已删除该作业！', function(){
+                                window.location.reload();
+                            });
+                        }else{
+                            layer.msg('操作失败，请重试！');
+                        }
+                    });
+                });
+            });
+
+        }
+
+        $(document).ready(function(){
+
+            $('input[name="start_time"]').change(function(){
+                var start_time = autoops.getTimeTool('formatTimeStr')($(this).val()),
+                    checkResult = autoops.getTimeTool('checkTimeLgNowTime')(start_time),
+                    that = this;
+                if(checkResult){
+                    layer.msg('所选日期大于当前日期！', function () {
+                        $(that).val("");
+                    });
+                    return false;
+                }
+                var $endval = $('input[name="end_time"]').val();
+                if($endval !== ''){
+                    var end_time = autoops.getTimeTool('formatTimeStr')($endval);
+                    checkResult = autoops.getTimeTool('checkStartLgEnd')(start_time, end_time);
+                    if(checkResult){
+                        layer.msg('开始日期大于截止日期！', function () {
+                            $(that).val("");
+                        });
+                        return false;
+                    }else{
+                        $('#table-container').load('{% url "issue_time_data" %}?start_time=' + (start_time*1 + 24*60*60) + '&end_time=' + (end_time*1 + 24*60*60), function(){
+                            bind_fun();
+                        });
+                    }
+                }
+            });
+
+            $('input[name="end_time"]').change(function(){
+                var start_time = autoops.getTimeTool('formatTimeStr')($('input[name="start_time"]').val()),
+                    end_time = autoops.getTimeTool('formatTimeStr')($(this).val()),
+                    checkResult = autoops.getTimeTool('checkTimeLgNowTime')(end_time),
+                    that = this;
+                if(checkResult){
+                    layer.msg('所选日期大于当前日期！', function () {
+                        $(that).val("");
+                    });
+                    return false;
+                }
+                checkResult = autoops.getTimeTool('checkStartLgEnd')(start_time, end_time);
+                if(checkResult){
+                    layer.msg('开始日期大于截止日期！', function () {
+                        $(that).val("");
+                    });
+                    return false;
+                }else{
+                    $('#table-container').load('{% url "issue_time_data" %}?start_time=' + (start_time*1 + 24*60*60) + '&end_time=' + (end_time*1 + 24*60*60), function(){
+                        bind_fun();
+                    });
+                }
+            });
+
+            $('#table-container').load('{% url "issue_data" %}?time=' + $('.query-time.active').attr("data-time"), function(){
+                bind_fun();
+            });
+            $('.query-time').click(function(){
+                $('.query-time').removeClass('active');
+                $(this).addClass('active');
+                $('#table-container').load('{% url "issue_data" %}?time=' + $(this).attr("data-time"), function(){
+                    bind_fun();
+                });
+            });
+
+            $('.env-btn').click(function(){
+                window.location.href = '{% url "create_issue" %}?menu=issue&env=' + $(this).text();
+            });
+
+        });
+
+    </script>
+
+{% endblock %}

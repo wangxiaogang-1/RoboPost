@@ -1,0 +1,504 @@
+{% extends 'frame.html' %}
+
+{% block css %}
+
+    <link href="/static/css/authorityList.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+                <div class="row">
+                    <!-- Start .row -->
+                    <!-- Start .page-header -->
+                    <div class="col-lg-12 heading">
+                        <h1 class="page-header"><i class="im-key"></i> 权限管理</h1>
+
+                        <button type="button" class="btn btn-success" id="changeView" title="切换视图"><i class="im-spinner5"></i>&nbsp; 切换视图</button>
+
+                        <!-- Start .bredcrumb -->
+                        <ul id="crumb" class="breadcrumb"></ul>
+                        <!-- End .breadcrumb -->
+
+                    </div>
+                    <!-- End .page-header -->
+                </div>
+                <!-- End .row -->
+                <div class="outlet">
+                    <div class="row" id="permissionDecideView">
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 panel panel-default">
+                            <!-- Start .panel -->
+                            <div class="panel-heading">
+                                <h4 class="panel-title">权限</h4>
+                            </div>
+                            <div class="panel-body permission-content">
+
+                                <table class="table table-hover">
+                                    <tbody>
+
+                                        {% for p in data.permission %}
+
+                                            <tr>
+                                                <td data-pid="{{ p.id }}">{{ p.name }}</td>
+                                            </tr>
+
+                                            {% empty %}
+                                            <tr>
+                                                <td>抱歉，暂时没有数据！</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 panel panel-default">
+                            <!-- Start .panel -->
+                            <div class="panel-heading">
+                                <h4 class="panel-title">组和用户</h4>
+                                <div class="panel-heading-content">
+                                    <a href="#" class="btn btn-success btn-xs" id="selectAll">全选</a>
+                                    <a href="#" class="btn btn-success btn-xs" id="cancelAll" style="display: none">全不选</a>
+                                    <a href="#" class="btn btn-success btn-xs" id="savePermission">保存</a>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="panel panel-default panel-closed toggle showControls" style="margin: 0;">
+                                        <!-- Start .panel -->
+                                        <div class="panel-heading empty-data" style="background: #eee;">
+                                            <h4 class="panel-title">未分组用户</h4>
+                                        </div>
+                                        <div class="panel-body" style="padding: 0;">
+
+                                            <table class="table table-hover users">
+                                                <tbody>
+
+                                                    {% for user in data.uag.userNotInGroup %}
+
+                                                        <tr>
+                                                            <td data-uid="{{ user.id }}" onclick="selectGroups(this)">
+                                                                <span style="padding-left: 15px;text-align: left">{{ user.first_name }}{{ user.last_name }}</span>
+                                                                <span style="padding-right: 15px;color: #ddd">&nbsp;&nbsp;{{ user.username }}</span>
+                                                            </td>
+                                                        </tr>
+
+                                                        {% empty %}
+                                                        <tr>
+                                                            <td class="empty-data">抱歉，暂时没有数据！</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                {% for group in data.uag.userInGroup %}
+
+                                    <div class="panel panel-default panel-closed toggle showControls groups" style="margin: 0;">
+                                        <!-- Start .panel -->
+                                        <div class="panel-heading empty-data" data-gid="{{ group.id }}" style="background: #eee;">
+                                            <h4 class="panel-title">{{ group.name }}</h4>
+                                        </div>
+                                        <div class="panel-body" style="padding: 0;">
+
+                                            <table class="table table-hover users">
+                                                <tbody>
+
+                                                    {% for user in group.users %}
+
+                                                        <tr>
+                                                            <td data-uid="{{ user.id }}" onclick="selectGroups(this)">
+                                                                <span style="padding-left: 15px;text-align: left">{{ user.first_name }}{{ user.last_name }}</span>
+                                                                <span style="padding-right: 15px;color: #ddd">&nbsp;&nbsp;{{ user.username }}</span>
+                                                            </td>
+                                                        </tr>
+
+                                                        {% empty %}
+                                                        <tr>
+                                                            <td class="empty-data">抱歉，暂时没有数据！</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                    {% empty %}
+
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row" id="userDecideView" style="display: none;">
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 panel panel-default groups">
+                            <!-- Start .panel -->
+                            <div class="panel-heading">
+                                <h4 class="panel-title">组和用户</h4>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="panel panel-default showControls" style="margin: 0;">
+                                        <!-- Start .panel -->
+                                        <div class="panel-heading empty-data" style="background: #eee;">
+                                            <h4 class="panel-title">未分组用户</h4>
+                                        </div>
+                                        <div class="panel-body" style="padding: 0;">
+
+                                            <table class="table table-hover users">
+                                                <tbody>
+
+                                                    {% for user in data.uag.userNotInGroup %}
+
+                                                        <tr>
+                                                            <td data-uid="{{ user.id }}" data-role="{{ user.is_superuser }}">
+                                                                <span style="padding-left: 15px;text-align: left">{{ user.first_name }}{{ user.last_name }}</span>
+                                                                <span style="padding-right: 15px;color: #ddd">&nbsp;&nbsp;{{ user.username }}</span>
+                                                            </td>
+                                                        </tr>
+
+                                                        {% empty %}
+                                                        <tr>
+                                                            <td class="empty-data">抱歉，暂时没有数据！</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                {% for group in data.uag.userInGroup %}
+
+                                    <div class="panel panel-default showControls groups" style="margin: 0;">
+                                        <!-- Start .panel -->
+                                        <div class="panel-heading empty-data" data-gid="{{ group.id }}" style="background: #eee;">
+                                            <h4 class="panel-title">{{ group.name }}</h4>
+                                        </div>
+                                        <div class="panel-body" style="padding: 0;">
+
+                                            <table class="table table-hover users">
+                                                <tbody>
+
+                                                    {% for user in group.users %}
+
+                                                        <tr>
+                                                            <td data-uid="{{ user.id }}" data-role="{{ user.is_superuser }}">
+                                                                <span style="padding-left: 15px;text-align: left">{{ user.first_name }}{{ user.last_name }}</span>
+                                                                <span style="padding-right: 15px;color: #ddd">&nbsp;&nbsp;{{ user.username }}</span>
+                                                            </td>
+                                                        </tr>
+
+                                                        {% empty %}
+                                                        <tr>
+                                                            <td class="empty-data">抱歉，暂时没有数据！</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                    {% empty %}
+
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 panel panel-default">
+                            <!-- Start .panel -->
+                            <div class="panel-heading">
+                                <h4 class="panel-title">权限</h4>
+                                <div class="panel-heading-content">
+                                    <a href="#" class="btn btn-success btn-xs" id="selectAll">全选</a>
+                                    <a href="#" class="btn btn-success btn-xs" id="cancelAll" style="display: none">全不选</a>
+                                    <a href="#" class="btn btn-success btn-xs" id="save-changes">保存</a>
+                                </div>
+                            </div>
+                            <div class="panel-body permission-content">
+
+                                <table class="table table-hover">
+                                    <tbody>
+
+                                        {% for p in data.permission %}
+
+                                            <tr>
+                                                <td data-pid="{{ p.id }}">{{ p.name }}</td>
+                                            </tr>
+
+                                            {% empty %}
+                                            <tr>
+                                                <td>抱歉，暂时没有数据！</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- End .outlet -->
+            </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script>
+
+        var permissionId = -1,groupId = -1,userId = -1;
+
+        function selectGroups(thisUoG){
+            if(permissionId !== -1){
+                $(thisUoG).toggleClass('selected');
+            }else{
+                layer.msg('请先选择权限！');
+            }
+        }
+
+        function selectPermission(thisPer){
+            if(groupId !== -1 || userId !== -1){
+                $(thisPer).toggleClass('selected');
+            }else{
+                layer.msg('请先选择用户或组！');
+            }
+        }
+
+        var view_component = (function(){
+
+            // view_controller 视图转换器
+            var $view_controller = $('#changeView');
+
+            // permission_view_dom 权限主导视图容器
+            var $pv_content = $('#permissionDecideView');
+
+            // user_decide_permission_view_dom 用户和组主导视图容器
+            var $udp_content = $('#userDecideView');
+
+            //  permission_dom_controller 权限DOM控制器
+            var $pd_controller = $('.permission-content tr td');
+
+            // user_group_dom_controller 用户组组件控制器
+            var $ugd_controller = $('.groups .panel-heading h4');
+
+            // user_dom_controller 用户组组件控制器
+            var $ud_controller = $('.users td');
+
+            $view_controller.click(function(){
+                $pv_content.toggle();
+                $udp_content.toggle();
+            });
+
+            /*
+            *
+            * */
+
+            $('#permissionDecideView .permission-content tr td').click(function(){
+                $('#permissionDecideView #selectAll').show();
+                $('#permissionDecideView #cancelAll').hide();
+                permissionId = $(this).attr('data-pid');
+                $('#permissionDecideView .permission-content td').removeClass('selected');
+                $(this).toggleClass('selected');
+                $.post("{% url 'getUsersAndUsersGroupsInPermission' %}",{'permissionId' : permissionId},function(result){
+                    var data = eval("(" + result + ")");
+                    $('#permissionDecideView .groups .panel-heading').removeClass('selected');
+                    $('#permissionDecideView .users td').removeClass('selected');
+                    $.each(data.usersGroup,function(index, item){
+                        $('#permissionDecideView .groups .panel-heading[data-gid="' + item + '"]').addClass('selected');
+                    })
+                    $.each(data.users,function(index, item){
+                        $('#permissionDecideView .users td[data-uid="' + item + '"]').addClass('selected');
+                    })
+                });
+            });
+
+            /*
+            *
+            * */
+
+            $('#permissionDecideView .groups .panel-heading h4').click(function(){
+                selectGroups($(this).parent());
+            });
+
+            /*
+            *
+            * */
+
+            $('#permissionDecideView #savePermission').click(function(){
+                if(permissionId === -1){
+                    layer.msg('请先选择权限！');
+                    return false;
+                }
+                var groups = [],users = [],groupDoms = $('#permissionDecideView .groups .panel-heading.selected'),userDoms = $('.users td.selected');
+                var data = {
+                    'permissionId' : permissionId,
+                    'userGroups' : [],
+                    'users' : []
+                }
+                $.each(groupDoms, function(index, item){
+                    groups.push($(item).attr('data-gid'));
+                });
+                $.each(userDoms, function(index, item){
+                    users.push($(item).attr('data-uid'));
+                });
+                data.userGroups = groups;
+                data.users = users;
+                $.post("{% url 'updateUsersAndUsersGroupsInPermission' %}",{"data" : JSON.stringify(data)}, function(result){
+                    if(result === 'success'){
+                        layer.msg('操作成功');
+                    };
+                });
+            });
+
+            /*
+            *
+            * */
+
+            $('#permissionDecideView #selectAll').click(function(){
+                if(permissionId === -1){
+                    layer.msg('请先选择权限！');
+                    return false;
+                }
+                $(this).hide();
+                $('#permissionDecideView #cancelAll').show();
+                $('#permissionDecideView .groups .panel-heading, .users td:not(.empty-data)').addClass('selected');
+            });
+
+            /*
+            *
+            * */
+
+            $('#permissionDecideView #cancelAll').click(function(){
+                if(permissionId === -1){
+                    layer.msg('请先选择权限！');
+                    return false;
+                }
+                $(this).hide();
+                $('#permissionDecideView #selectAll').show();
+                $('#permissionDecideView .groups .panel-heading, .users td:not(.empty-data)').removeClass('selected');
+            })
+
+            /*
+            *
+            * */
+
+            $('#userDecideView .panel-body .panel-heading').click(function(){
+                groupId = $(this).attr('data-gid');
+                $('#userDecideView #selectAll').show();
+                $('#userDecideView #cancelAll').hide();
+                userId = -1;
+                $('#userDecideView .panel-body .panel-heading,#userDecideView .users td').removeClass('selected');
+                $(this).toggleClass('selected');
+                $.post("{% url 'getGroupPermission' %}",{'groupId' : groupId},function(result){
+                    console.log(result)
+                    var data = eval("(" + result + ")");
+                    $('#userDecideView .permission-content tr td').removeClass('selected');
+                    $.each(data,function(index, item){
+                        $('#userDecideView .permission-content tr td[data-pid="' + item + '"]').addClass('selected');
+                    })
+                });
+            });
+
+            /*
+            *
+            * */
+
+            $('#userDecideView .users td').click(function(){
+                userId = $(this).attr('data-uid');
+                var userRole = $(this).attr('data-role');
+                $('#userDecideView #selectAll').show();
+                $('#userDecideView #cancelAll').hide();
+                groupId = -1;
+                console.log(userRole)
+                if(userRole === '1'){
+                    layer.msg('该用户是超级管理员，不需要授权！')
+                }
+                $('#userDecideView .panel-body .panel-heading,#userDecideView .users td').removeClass('selected');
+                $(this).toggleClass('selected');
+                $.post("{% url 'getUserPermission' %}",{'userId' : userId},function(result){
+                    var data = eval("(" + result + ")");
+                    $('#userDecideView .permission-content tr td').removeClass('selected');
+                    $.each(data,function(index, item){
+                        $('#userDecideView .permission-content tr td[data-pid="' + item + '"]').addClass('selected');
+                    })
+                });
+            });
+
+            /*
+            *
+            * */
+
+            $('#userDecideView #save-changes').click(function(){
+                var permissionDoms = $('#userDecideView .permission-content tr td.selected');
+                var data = {
+                    'groupId' : groupId,
+                    'userId' : userId,
+                    'permissions' : []
+                }
+                $.each(permissionDoms, function(index, item){
+                    data.permissions.push($(item).attr('data-pid'));
+                });
+                $.post("{% url 'savePermissionToGroupOrUser' %}",{"data" : JSON.stringify(data)}, function(result){
+                    if(result === 'success'){
+                        layer.msg('操作成功');
+                    };
+                });
+            });
+
+            /*
+            *
+            * */
+
+            $('#userDecideView .permission-content tr td').click(function(){
+                selectPermission($(this));
+            });
+
+            /*
+            *
+            * */
+
+            $('#userDecideView #selectAll').click(function(){
+                if(groupId === -1 && userId === -1){
+                    layer.msg('请先选择用户或用户组！');
+                    return false;
+                }
+                $(this).hide();
+                $('#userDecideView #cancelAll').show();
+                $('#userDecideView .permission-content tr td').addClass('selected');
+            });
+
+            /*
+            *
+            * */
+
+            $('#userDecideView #cancelAll').click(function(){
+                if(groupId === -1 && userId === -1){
+                    layer.msg('请先选择权限！');
+                    return false;
+                }
+                $(this).hide();
+                $('#userDecideView #selectAll').show();
+                $('#userDecideView .permission-content tr td').removeClass('selected');
+            });
+
+        })();
+
+        $(document).ready(function(){
+
+        });
+
+    </script>
+
+{% endblock %}

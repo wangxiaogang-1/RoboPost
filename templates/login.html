@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>自动化发布系统</title>
+    <!-- Mobile specific metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!-- Force IE9 to render in normal mode -->
+    <!--[if IE]><meta http-equiv="x-ua-compatible" content="IE=9" /><![endif]-->
+    <meta name="author" content="SuggeElson" />
+    <meta name="description" content=""
+    />
+    <meta name="keywords" content=""
+    />
+    <meta name="application-name" content="sprFlat admin template" />
+    <!--[if lt IE 9]>
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css" />
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:700" rel="stylesheet" type="text/css" />
+<link href="http://fonts.googleapis.com/css?family=Droid+Sans:400" rel="stylesheet" type="text/css" />
+<link href="http://fonts.googleapis.com/css?family=Droid+Sans:700" rel="stylesheet" type="text/css" />
+<![endif]-->
+    <!-- Css files -->
+    <!-- Icons -->
+    <link href="/static/assets/css/icons.css" rel="stylesheet" />
+    <!-- jQueryUI -->
+    <link href="/static/assets/css/sprflat-theme/jquery.ui.all.css" rel="stylesheet" />
+    <!-- Bootstrap stylesheets (included template modifications) -->
+    <link href="/static/assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- Plugins stylesheets (all plugin custom css) -->
+    <link href="/static/assets/css/plugins.css" rel="stylesheet" />
+    <!-- Main stylesheets (template main css file) -->
+    <link href="/static/assets/css/main.css" rel="stylesheet" />
+    <!-- Custom stylesheets ( Put your own changes here ) -->
+    <link href="/static/assets/css/custom.css" rel="stylesheet" />
+    <!-- Fav and touch icons -->
+    <!-- Windows8 touch icon ( http://www.buildmypinnedsite.com/ )-->
+    <meta name="msapplication-TileColor" content="#3399cc" />
+
+    <link href="/static/css/login.css" rel="stylesheet" />
+
+</head>
+<body class="login-page">
+<!-- Start #login -->
+<div id="login" class="animated bounceIn">
+    <img src="/static/img/logo.png" alt class="logo">
+    <h2 style="color: #fff;margin-bottom: 20px;">亚太发布平台</h2>
+    <!-- Start .login-wrapper -->
+    <div class="login-wrapper">
+        <div id="myTabContent" class="tab-content bn">
+            <div class="tab-pane fade active in" id="log-in">
+                <form class="form-horizontal mt10 login-form" action="index.html" id="login-form" role="form">
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <input type="text" name="username" id="username" class="form-control left-icon" placeholder="请输入你的用户名" autofocus>
+                            <i class="ec-user s16 left-input-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <input type="password" name="passwd" id="password" class="form-control left-icon" placeholder="请输入你的密码">
+                            <i class="ec-locked s16 left-input-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <!-- col-lg-12 end here -->
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <!-- col-lg-12 start here -->
+                            <button class="btn btn-success login-btn" type="button" onclick="login();">登&nbsp;&nbsp;录</button>
+                        </div>
+                        <!-- col-lg-12 end here -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End #.login-wrapper -->
+</div>
+<!-- End #login -->
+
+
+<!-- Load pace first -->
+<script src="/static/assets/plugins/core/pace/pace.min.js"></script>
+<!-- Important javascript libs(put in all pages) -->
+<script src="/static/assets/js/jquery-1.8.3.min.js"></script>
+<script>
+    window.jQuery || document.write('<script src="/static/assets/js/libs/jquery-2.1.1.min.js">\x3C/script>')
+</script>
+<script src="/static/assets/js/jquery-ui.js"></script>
+<!--[if lt IE 9]>
+  <script type="text/javascript" src="/static/assets/js/libs/excanvas.min.js"></script>
+  <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <script type="text/javascript" src="/static/assets/js/libs/respond.min.js"></script>
+<![endif]-->
+<!-- Bootstrap plugins -->
+<script src="../static/assets/js/bootstrap/bootstrap.js"></script>
+<!-- Form plugins -->
+<script src="/static/assets/plugins/forms/icheck/jquery.icheck.js"></script>
+<script src="/static/assets/plugins/forms/validation/jquery.validate.js"></script>
+<script src="/static/assets/plugins/forms/validation/additional-methods.min.js"></script>
+<script src="/static/plugins/layer/layer.js"></script>
+<!-- Init plugins olny for this page -->
+<script src="/static/assets/js/pages/login.js"></script>
+<script src="/static/plugins/layer/layer.js"></script>
+<script src="/static/js/circleMagic.js"></script>
+<script>
+
+    checks = {
+        'uname_or_passwd_error' : '用户名或密码错误，请重试！',
+        'null_permission_error' : '你的用户没有任何权限！'
+    };
+
+    function login_error(result){
+        layer.msg('登录失败：' + checks[result], {
+            time: 1500,
+            icon: 5
+        }, function(){
+            $('input[name="passwd"]').val('');
+        });
+    }
+
+    // 检查用户是否成登录
+    function checkLogin(result){
+        result = result.split(':');
+        var result_type = result[0],
+            result_msg = result[1],
+            message = {
+                success : function(){
+                    layer.msg('登录成功！', {
+                        time: 1500,
+                        icon: 1
+                    }, function(){
+                        window.location.href = {% url 'index' %};
+                    });
+                },
+                error : function(){
+                    login_error(result_msg)
+                }
+            };
+        message[result_type]();
+    }
+
+    // 登录方法
+    function login(){
+        $.post("{% url 'auth_login' %}",
+            {
+                username : $('input[name="username"]').val(),
+                passwd : $('input[name="passwd"]').val()
+            },function(result){
+                checkLogin(result);
+            }
+        );
+    }
+
+    $(document).ready(function(){
+
+        $('body').circleMagic({
+            radius: 80,
+            density: .01,
+            color: 'rgba(255,255,255, .4)',
+            clearOffset: 1
+        });
+
+        $(document).keyup(function(event){
+            if(event.keyCode === 13){
+                login();
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

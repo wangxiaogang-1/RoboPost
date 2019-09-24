@@ -1,0 +1,7 @@
+{% extends 'error_base.html' %}
+
+{% block error_code %}403{% endblock %}
+
+{% block error_msg %}请求拒绝！{% endblock %}
+
+{% block error_details %}服务器收到了你请求的内容，但是由于其中含有不符合协议的内容而被服务器拒绝。{% endblock %}

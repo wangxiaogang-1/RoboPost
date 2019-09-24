@@ -1,0 +1,43 @@
+
+.form-content {
+    padding: 20px 10px;
+}
+
+.label,
+.form-text,
+.form-textarea{
+    line-height: 32px;
+    padding: 0 12px;
+}
+
+.label  {
+    font-size: 15px;
+}
+
+.form-text,
+.form-textarea{
+    font-family: "Microsoft YaHei",
+                  "宋体", "Segoe UI",
+                  "Lucida Grande",
+                   Helvetica, Arial,
+                   sans-serif,
+                   FreeSans,
+                   Arimo;
+    font-size: 16px;
+}
+
+.form-textarea {
+    height: 5em;
+}
+
+.log-content {
+    padding: 3%;
+}
+
+.log-content > .panel > .panel-body > textarea {
+    width: 100%;
+    resize: none;
+    height: 35em;
+    border: none;
+    padding: 1.5em;
+}

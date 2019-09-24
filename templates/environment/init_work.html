@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/js/jquery-2.1.1.min.js"></script>
+    <script>
+        $(function () {
+            $('#create_work').click(function () {
+                window.location.href='{% url 'create_work' %}'
+            });
+
+        })
+    </script>
+</head>
+<body>
+<input id="create_work" type="button" style="float: right;" value="创建作业"><br/>
+<table border="1">
+{% for work in works %}
+
+
+    {{ work.work_name }}<br/>
+    <a href="{% url 'edit_work' %}">{{ work.id }} 修改</a><br/>
+    <a href="#">{{ work.work_name }} 执行</a><br/>
+    <a href="#">{{ work.work_name }} 删除</a><br/>
+    <a href="#">{{ work.work_name }} 中断</a><br/>
+    <a href="#">{{ work.work_name }} 查看</a><br/>
+    <a href="#">{{ work.work_name }} 执行下一环节</a><br/>
+    <a href="#">{{ work.work_name }} 终止</a><br/>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

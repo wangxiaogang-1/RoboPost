@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+<script src="/static/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#uat').click(function () {
+
+            $.ajax({
+                type:'GET',
+                url:'{% url "show_servers_env" %}',
+                data: {"temp":"1","env":"UAT测试"},
+                datatype:'json',
+                success:function (result) {
+                    $('.container').html("");
+                    var json = JSON.parse(result);
+                    var tbody = $('#app_tbody');
+                    var str = "";
+
+                    console.log(json)
+                    $.each(json,function (index,item) {
+                        console.log(item)
+{#                        str += "<tr>" +#}
+{#                        "<td>" + item + "</td>" +#}
+{#                        "</tr>";#}
+
+                    });
+                    tbody.innerHTML = str
+                }
+
+
+            })
+        })
+    })
+</script>
+</head>
+<body>
+{{ request.session.user.first_name }}{{ request.session.user.last_name }}<br/>
+{{ tmp_type }}
+
+
+<h2>apps</h2>
+    <input style="color: #e52536;width: 120px" type="button" value="新建app">
+<hr/>
+<table id="app" border="1" width='80%'>
+    <tr>
+        <th>id</th>
+        <th>ip</th>
+        <th>host</th>
+        <th>account</th>
+        <th>password</th>
+        <th>app_directory</th>
+        <th>middleware_name</th>
+        <th>middleware_pass</th>
+        <th>url</th>
+        <th>upload_path</th>
+        <th>port</th>
+        <th>log_path</th>
+        <th>env_type</th>
+        <th colspan="2">操作按钮</th>
+    </tr>
+
+{% for app in apps %}
+    <tbody id="app_tbody">
+        <tr class="container">
+            <td>{{ app.id }}</td>
+            <td>{{ app.app_ip }}</td>
+            <td>{{ app.hostname }}</td>
+            <td>{{ app.account }}</td>
+            <td>{{ app.password }}</td>
+            <td>{{ app.app_directory }}</td>
+            <td>{{ app.middleware_name }}</td>
+            <td>{{ app.middleware_pass }}</td>
+            <td>{{ app.url }}</td>
+            <td>{{ app.upload_path }}</td>
+            <td>{{ app.port }}</td>
+            <td>{{ app.log_path }}</td>
+            <td>{{ app.env_type }}</td>
+            <td>
+                <input style="color: #63e544;width: 120px" type="button" value="修改">
+            </td>
+            <td>
+                <input style="color: #e52536;width: 120px" type="button" value="删除">
+            </td>
+        </tr>
+    </tbody>
+{% endfor %}
+
+</table>
+
+
+<h2>dbs</h2>
+    <input style="color: #e52536;width: 120px" type="button" value="新建db">
+<hr/>
+<table id="db" border="1">
+    <tr>
+        <th>id</th>
+        <th>ip</th>
+        <th>hostname</th>
+        <th>account</th>
+        <th>password</th>
+        <th>db_name</th>
+        <th>db_account</th>
+        <th>db_password</th>
+        <th>port</th>
+        <th>env_type</th>
+        <th colspan="2">操作按钮</th>
+    </tr>
+    <tr>
+    {% for db in dbs %}
+         <td>{{ db.id }}</td>
+         <td>{{ db.db_ip }}</td>
+         <td>{{ db.hostname }}</td>
+         <td>{{ db.account }}</td>
+         <td>{{ db.password }}</td>
+         <td>{{ db.db_name }}</td>
+         <td>{{ db.db_account }}</td>
+         <td>{{ db.db_password }}</td>
+         <td>{{ db.port }}</td>
+         <td>{{ db.env_type }}</td>
+         <td>
+             <input style="color: #63e544;width: 120px" type="button" value="修改">
+         </td>
+         <td>
+             <input style="color: #e52536;width: 120px" type="button" value="删除">
+         </td>
+            <hr/>
+    </tr>
+{% endfor %}
+
+</table>
+
+
+
+</body>
+</html>

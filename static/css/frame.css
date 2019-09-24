@@ -1,0 +1,37 @@
+
+/**
+    主模板样式
+*/
+
+body .theme-default .layui-layer-title {
+    background: #5fc0ea;
+    color: #fff;
+    border: none;
+}
+
+body .theme-default .layui-layer-btn a {
+    background: #fff;
+    border: solid 1px #75b9e6;
+    color: #75b9e6;
+}
+
+body .theme-default .layui-layer-btn .layui-layer-btn1 {
+    background: #75b9e6;
+    border: none;
+    color: #fff;
+}
+
+#sideNav>li a.active {
+    background: #ddd;
+}
+
+.tips {
+    background: #5fc0ea;
+    text-align: center;
+}
+
+#title-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}

@@ -1,0 +1,46 @@
+
+.permission-content {
+    height: 620px;
+    padding: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#permissionDecideView .permission-content tr td.selected {
+    background: #ddd !important;
+}
+
+#userDecideView .permission-content tr td.selected {
+    background: rgba(113, 211, 152, .3) !important;
+}
+
+.permission-content tr td:hover {
+    cursor: pointer;
+}
+
+.groups .panel-heading h4 {
+    width: 90%;
+}
+
+.panel-heading {
+    background: #ddd;
+}
+
+#permissionDecideView .panel-heading.selected {
+    background: rgba(113, 211, 152, .3) !important;
+}
+
+#permissionDecideView .users tr td.selected {
+    background: rgba(113, 211, 152, .3) !important;
+}
+
+#userDecideView .panel-heading.selected,
+#userDecideView .users tr td.selected {
+    background: #ddd !important;
+}
+
+#changeView {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}

@@ -1,0 +1,7 @@
+{% extends 'error_base.html' %}
+
+{% block error_code %}405{% endblock %}
+
+{% block error_msg %}未包含请求的信息！{% endblock %}
+
+{% block error_details %}	请求行中指定的请求方法不能被用于请求相应的资源，该响应必须返回一个Allow 头信息用以表示出当前资源能够接受的请求方法的列表。{% endblock %}

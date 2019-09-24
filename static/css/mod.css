@@ -1,0 +1,20 @@
+
+#createMod {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+.t-btn button {
+    width: 150px;
+}
+
+.time-btn button {
+    color: #00cc66;
+}
+
+.time-btn button.active {
+    background: #00cc66;
+    border-color: #00cc66;
+    color: #fff;
+}

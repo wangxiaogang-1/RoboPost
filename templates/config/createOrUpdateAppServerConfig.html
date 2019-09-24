@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或更新应用服务器配置</title>
+    <link href="/static/assets/plugins/layui/css/layui.css" rel="stylesheet" />
+    <script src="/static/assets/plugins/layui/layui.js"></script>
+    <style>
+        #user {
+            padding: 4em 0;
+        }
+        #groups input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        input:disabled {
+            background: #eee;
+            border: solid 1px #ddd !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="layui-container">
+      <div class="layui-row">
+        <div class="layui-col-lg12 layui-col-md12 layui-col-sm12">
+          <form class="layui-form" action="" id="app_host">
+              <input type="hidden" name="id" value="{{ host.id }}">
+              <input type="hidden" name="content_id" value="{{ proj.id }}">
+              <div class="layui-form-item">
+                <label class="layui-form-label">平台</label>
+                <div class="layui-input-block">
+                  <select name="platform" lay-verify="required">
+                    <option value="">请选择平台</option>
+                    {% for platform in platforms %}
+                        <option value="{{ platform }}" {% if platform == host.platform %}selected{% endif %}>{{ platform }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">省市</label>
+                <div class="layui-input-block">
+                  <select name="province" lay-verify="required">
+                    <option value="">请选择省市</option>
+                    {% for province in provinces %}
+                        <option value="{{ province }}" {% if province == host.province %}selected{% endif %}>{{ province }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">项目</label>
+                <div class="layui-input-block">
+                  <select name="project" lay-verify="required">
+                    <option value="">请选择项目</option>
+                    {% for proj in projects %}
+                        <option value="{{ proj.confV }}"  {% if proj.confV == host.project %}selected{% endif %}>{{ proj.confV }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">IP</label>
+                <div class="layui-input-block">
+                  <input type="text" name="IP" value="{{ host.IP }}" required  lay-verify="required" placeholder="请输入IP" autofocus="true" class="layui-input" maxlength="20">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">主机名</label>
+                <div class="layui-input-block">
+                  <input type="text" name="host_name" value="{{ host.host_name }}" required  lay-verify="required" placeholder="请输入主机名" autofocus="true" class="layui-input" maxlength="20">
+                </div>
+              </div>
+              <input type="hidden" name="server_type" value="app">
+              <div class="layui-form-item">
+                <label class="layui-form-label">账号</label>
+                <div class="layui-input-block">
+                  <input type="text" name="account" value="{{ host.account }}"  required  lay-verify="required" placeholder="请输入服务器账号" autofocus="true" class="layui-input" maxlength="20">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" name="password" value="{{ host.password }}" required lay-verify="required" placeholder="请输入服务器密码" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">项目目录</label>
+                <div class="layui-input-block">
+                  <input type="text" name="app_directory" value="{{ proj.app_directory }}" required  lay-verify="required" placeholder="请输入项目目录" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">中间件类型</label>
+                <div class="layui-input-block">
+                  <select name="middleware_type" lay-verify="required">
+                    <option value="">请选择中间件类型</option>
+                    {% for mt in middleware_type %}
+                        <option value="{{ mt }}"  {% if mt == proj.middleware_type %}selected{% endif %}>{{ mt }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">中间件账号</label>
+                <div class="layui-input-block">
+                  <input type="text" name="middleware_name" value="{{ proj.middleware_name }}" required  lay-verify="required" placeholder="请输入中间件账号" class="layui-input" maxlength="30">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">中间件密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" name="middleware_pass" value="{{ proj.middleware_pass }}" required lay-verify="required" placeholder="请输入中间件密码" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">URL</label>
+                <div class="layui-input-block">
+                  <input type="url" name="url" value="{{ proj.url }}" placeholder="请输入项目访问地址" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">重启脚本</label>
+                <div class="layui-input-block">
+                  <input type="text" name="restart_script_path" value="{{ proj.restart_script_path }}" placeholder="请输入重启脚本路径" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                    <label class="layui-form-label">静态目录</label>
+                    <div class="layui-input-block">
+                      <input type="text" name="static_directory" value="{{ proj.static_directory }}" placeholder="请输入静态目录路径" class="layui-input">
+                    </div>
+                  </div>
+              <div class="layui-form-item">
+                    <label class="layui-form-label">缓存目录</label>
+                    <div class="layui-input-block">
+                      <input type="text" name="cache_directory" value="{{ proj.cache_directory }}" placeholder="请输入缓存目录路径" class="layui-input">
+                    </div>
+              </div>
+
+              <div class="layui-form-item">
+                <div class="layui-input-block">
+                  <button class="layui-btn layui-btn-normal" lay-submit lay-filter="save">立即提交</button>&nbsp;
+                  <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+              </div>
+            </form>
+        </div>
+      </div>
+</div>
+</body>
+</html>
+<script src="/static/assets/js/jquery-1.8.3.min.js"></script>
+<script src="/static/js/tools.js"></script>
+<script>
+
+    $(document).ready(function(){
+        layui.use('form', function(){
+
+          layer.config({
+            skin: 'theme-default'
+          });
+
+          var form = layui.form;
+
+          form.on('submit(save)', function(data){
+                $.post("{% url 'createHostInfo' %}",data.field, function(result){
+                    layer.msg('操作成功！',function(){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index,function(){});
+                        parent.location.reload()
+                    });
+                });
+                return false;
+              });
+        });
+    })
+</script>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户</title>
+    <link href="/static/assets/plugins/layui/css/layui.css" rel="stylesheet" />
+    <script src="/static/assets/plugins/layui/layui.js"></script>
+    <style>
+        #user {
+            padding: 4em 0;
+        }
+        #groups input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        input:disabled {
+            background: #eee;
+            border: solid 1px #ddd !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="layui-container">
+      <div class="layui-row">
+        <div class="layui-col-lg12 layui-col-md12 layui-col-sm12">
+          <form class="layui-form" action="" id="user">
+              <input type="hidden" name="id" value="{{ init_data.user.id | default:'-1' }}">
+              <input type="hidden" name="last_login">
+              <input type="hidden" name="date_joined">
+              <input type="hidden" name="is_staff" value="1">
+              <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                  <input type="text" name="username" value="{{ init_data.user.username }}" required  lay-verify="required" placeholder="请输入用户名" autofocus="true" class="layui-input" maxlength="20">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div id="password-content">
+                    <div class="layui-input-inline">
+                      <input type="password" name="password" required lay-verify="passwd" placeholder="请输入密码" class="layui-input" maxlength="16">
+                    </div>
+                    <div class="layui-input-inline">
+                      <input type="password" id="password-confirm" required placeholder="再次输入密码" class="layui-input" maxlength="16">
+                    </div>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">姓氏</label>
+                <div class="layui-input-block">
+                  <input type="text" name="first_name" value="{{ init_data.user.first_name }}" required  lay-verify="required" placeholder="请输入姓氏" class="layui-input" maxlength="30">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">名字</label>
+                <div class="layui-input-block">
+                  <input type="text" name="last_name" value="{{ init_data.user.last_name }}" required  lay-verify="required" placeholder="请输入名字" class="layui-input" maxlength="30">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-block">
+                  <input type="text" name="email" value="{{ init_data.user.email }}" placeholder="请输入邮箱" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item" id="is_superuser">
+                <label class="layui-form-label">身份</label>
+                {% for iden in init_data.user_iden %}
+                    <input type="radio" name="is_superuser" value="{{ forloop.counter0 }}" data-val="{{ forloop.counter0 }}" title="{{ iden }}"
+                    {% if forloop.counter0 == init_data.user.is_superuser %}checked{% endif %}>
+                {% endfor %}
+              </div>
+              <div class="layui-form-item" id="is_active">
+                <label class="layui-form-label">状态</label>
+                {% for status in init_data.user_status %}
+                    <input type="radio" name="is_active" value="{{ forloop.counter0 }}" data-val="{{ forloop.counter0 }}" title="{{ status }}"
+                    {% if forloop.counter0 == init_data.user.is_active %}checked{% endif %}>
+                {% endfor %}
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">所属组</label>
+                <div class="layui-input-block" id="groups">
+
+                    {% for group in init_data.groups %}
+
+                        <input type="checkbox" value="{{ group.id }}" title="{{ group.name }}"
+
+                               {% for ug in init_data.user_groups %}
+
+                                    {% if group.id == ug.id %}checked{% endif %}
+
+                                {% endfor %}>
+
+                    {% endfor %}
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-input-block">
+                  <button class="layui-btn layui-btn-normal" lay-submit lay-filter="userSave">立即提交</button>&nbsp;
+                  <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+              </div>
+            </form>
+        </div>
+      </div>
+</div>
+</body>
+</html>
+<script src="/static/assets/js/jquery-1.8.3.min.js"></script>
+<script src="/static/js/tools.js"></script>
+<script>
+
+    function changePassword(){
+        layer.prompt({title: '输入新密码', formType: 1}, function(passwd, index){
+          layer.close(index);
+          layer.prompt({title: '确认密码', formType: 1}, function(passagain, index){
+            layer.close(index);
+            if(passwd !== passagain){
+                layer.msg('两次输入的密码不一致，操作失败！');
+            }else{
+                $.post("{% url 'changePassword' %}",{ 'userId' : parent.thisUserId, 'newPasswd' : passwd },function(result){
+                    if(result === 'success'){
+                        layer.msg('修改成功！');
+                    }
+                });
+            }
+          });
+        });
+    }
+
+    function initUpdate(){
+        var thisUserId = $('input[name="id"]').val();
+        if(thisUserId*1 === -1){
+            $('input[name="is_superuser"]:first, input[name="is_active"]:last').attr('checked',true);
+            return false;
+        }
+        $('input[type="password"]').attr('disabled',true).remove();
+        $('#password-content').html(
+            '<div class="layui-input-block">'+
+            '未存储原始密码，因此无法查看此用户的密码，你可以'+
+            '<button type="button" class="layui-btn layui-btn-radius layui-btn-xs layui-btn-normal" id="change-password" onclick="changePassword()">修改密码</button></div>'
+        )
+    }
+
+    $(document).ready(function(){
+
+        layui.use('form', function(){
+
+        layer.config({
+            skin: 'theme-default'
+        });
+
+        var form = layui.form;
+
+        form.verify({
+        username: function(value, item){ //value：表单的值、item：表单的DOM对象
+        if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+            return '用户名不能有特殊字符';
+        }
+        if(/(^\_)|(\__)|(\_+$)/.test(value)){
+            return '用户名首尾不能出现下划线\'_\'';
+        }
+        if(/^\d+\d+\d$/.test(value)){
+            return '用户名不能全为数字';
+        }
+        },
+        //我们既支持上述函数式的方式，也支持下述数组的形式
+        //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+        passwd: function(value, item){
+            if(!/^[\S]{6,16}$/.test(value)){
+            return '密码必须6到16位，且不能出现空格';
+            }
+            if($('#password-confirm').val() !== value){
+            return '两次输入的密码不一致';
+            }
+        }
+        });
+        form.on('submit(userSave)', function(data){
+                var selectedGroupIds = [];
+                var selectedGroupDom = $('#groups').children(':checked');
+                $.each(selectedGroupDom, function(index, item){
+                    selectedGroupIds.push(parseInt($(item).val()));
+                });
+                data.field.userGroupIds = JSON.stringify(selectedGroupIds);
+                data.field.is_active = $('input[name="is_active"]:checked').attr('data-val');
+                data.field.is_superuser = $('input[name="is_superuser"]:checked').attr('data-val');
+                $.post("{% url 'createOrUpdateUser' %}",{data : JSON.stringify(data.field)}, function(result){
+                    if(result === 'success'){
+                        layer.msg('操作成功！',function(){
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index,function(){});
+                            parent.location.reload()
+                        });
+                    }else{
+                        layer.msg('操作失败，请重试！');
+                    }
+                });
+                return false;
+            });
+        });
+        initUpdate();
+    });
+</script>

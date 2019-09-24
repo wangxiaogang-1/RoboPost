@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/js/jquery-2.1.1.min.js"></script>
+    <script>
+        $(function () {
+            $('#pid').change(function () {
+                id_val = $('#pid').val();
+                $.ajax({
+                    type:'POST',
+                    url:'{% url 'init_ips' %}',
+                    data:{"temp_id":id_val},
+                    dataType:'json',
+                    success:function (data) {
+                        $('#default').remove()
+                        var app = data['app_ip'];
+                        var db = data['db_ip'];
+                        var $div_app = $('#div_app');
+                        var $div_db = $('#div_db');
+                        $div_app.html('');
+                        $div_db.html('');
+                        $('#h5_app').text('app');
+                        $('#h5_db').text('db');
+                        $.each(app, function (index,item) {
+                            $div_app.append(
+                                   '<input id="' + item + '" value="'+ item +'"><br>'
+                               );
+                        });
+                        $.each(db, function (index,item) {
+                            $div_db.append(
+                                   '<input id="' + item + '" value="'+ item +'"><br>'
+                               );
+                        });
+                    }
+
+                })
+            })
+        })
+    </script>
+</head>
+<body>
+创建作业页面
+<form action="" method="POST">
+    作业名称
+    <label>
+        <input type="text"/>
+    </label>选择模板‍‍
+
+    <label for="pid">
+        <select id="pid">
+            <option id="default" value="">请选择</option>
+            {% for foo in temp %}
+            <option value="{{ foo.id }}">{{ foo }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <div>
+        本地包存储路径<input type="text" name="public_dir">
+    </div>
+    <div>
+        本地svn路<input type="text" name="local_path">
+    </div>
+    <p style="color: red">常用参数列表</p>
+    <div>
+        {% for foo,boo in work_params.items %}
+            <input name="{{ foo }}" style="width:300px; height: 40px;" type="text" value="{{ boo|first }}">{{ boo|last }}<br/>
+        {% endfor %}
+        
+    </div>
+</form>
+<div id="h5_app">
+
+</div>
+<div id="div_app"></div>
+
+    <hr/>
+<div id="h5_db">
+
+</div>
+<div id="div_db"></div>
+
+</body>
+</html>

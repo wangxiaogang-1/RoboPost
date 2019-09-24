@@ -1,0 +1,574 @@
+{% extends 'frame.html' %}
+{%load filter%}
+
+{% block css %}
+
+    <style>
+
+        .query-time.active {
+            background: #fff !important;
+            border-color: #fff !important;
+            color: #75b9e6 !important;
+        }
+
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-lg-12 heading">
+                <ul id="crumb" class="breadcrumb">
+                </ul>
+            </div>
+        </div>
+        <div class="outlet">
+            <div class="row">
+                <!-- Admin cards -->
+                {% if request.session.user.is_superuser %}
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel slide">
+                            <div class="carousel-inner">
+                                {% for sc in server_count %}
+                                    <div class="item {% if forloop.counter == 1 %}active{% endif %}" id="{{ sc.id }}">
+                                        <div class="tile dark">
+                                            <div class="tile-icon">
+                                                <i class="fa-desktop s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>APP服务器</b>&nbsp;&nbsp;{{ sc.count | default:0 }}&nbsp;&nbsp;<b>DB服务器</b>&nbsp;&nbsp;0</h3>
+                                                <h3 style="line-height: 28px;">{{ sc.desc }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="item active">
+                                        <div class="tile yellow">
+                                            <div class="tile-icon">
+                                                <i class="im-books s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>APP服务器</b>&nbsp;&nbsp;0</h3>
+                                                <h3 style="line-height: 28px;">暂无数据</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel vertical slide">
+                            <div class="carousel-inner">
+                                {% for asc in all_server_count %}
+                                    <div class="item {% if forloop.counter == 1 %}active{% endif %}" id="{{ asc.id }}">
+                                        <div class="tile green">
+                                            <div class="tile-icon">
+                                                <i class="ec-earth s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>服务器总数</b>&nbsp;&nbsp;{{ asc.count | default:0 }}</h3>
+                                                <h3 style="line-height: 28px;">{{ asc.desc }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="item active">
+                                        <div class="tile yellow">
+                                            <div class="tile-icon">
+                                                <i class="im-books s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>服务器总数</b>&nbsp;&nbsp;0</h3>
+                                                <h3 style="line-height: 28px;">暂无数据</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel slide">
+                            <div class="carousel-inner">
+                                {% for work in works %}
+                                    <div class="item {% if work.belong_sys == '核心组' %}active{% endif %}">
+                                        <div class="tile yellow">
+                                            <div class="tile-icon">
+                                                <i class="im-books s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>发布量</b>&nbsp;&nbsp;{{ work.count | default:0 }}</h3>
+                                                <h3 style="line-height: 28px;">{{ work.belong_sys }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="item active">
+                                        <div class="tile yellow">
+                                            <div class="tile-icon">
+                                                <i class="im-books s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>发布量</b>&nbsp;&nbsp;0</h3>
+                                                <h3 style="line-height: 28px;">暂无数据</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel slide">
+                            <div class="carousel-inner">
+                                {% for uc in user_count %}
+                                    <div class="item {% if forloop.counter == 1 %}active{% endif %}" id="{{ uc.id }}">
+                                        <div class="tile purple">
+                                            <div class="tile-icon">
+                                                <i class="im-user s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>用户量</b>&nbsp;&nbsp;{{ uc.count | default:0 }}</h3>
+                                                <h3 style="line-height: 28px;">{{ uc.desc }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="item active">
+                                        <div class="tile yellow">
+                                            <div class="tile-icon">
+                                                <i class="im-books s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>用户量</b>&nbsp;&nbsp;0</h3>
+                                                <h3 style="line-height: 28px;">暂无数据</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Normal cards -->
+                {% else %}
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel slide">
+                            <div class="carousel-inner">
+                                {% for sc in server_count %}
+                                    <div class="item {% if forloop.counter == 1 %}active{% endif %}" id="{{ sc.id }}">
+                                        <div class="tile dark">
+                                            <div class="tile-icon">
+                                                <i class="fa-desktop s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>APP服务器</b>&nbsp;&nbsp;{{ sc.count | default:0 }}&nbsp;&nbsp;<b>DB服务器</b>&nbsp;&nbsp;0</h3>
+                                                <h3 style="line-height: 28px;">{{ sc.desc }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel vertical slide">
+                            <div class="carousel-inner">
+                                {% for asc in all_server_count %}
+                                    <div class="item {% if forloop.counter == 1 %}active{% endif %}" id="{{ asc.id }}">
+                                        <div class="tile green">
+                                            <div class="tile-icon">
+                                                <i class="ec-earth s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>服务器总数</b>&nbsp;&nbsp;{{ asc.count | default:0 }}</h3>
+                                                <h3 style="line-height: 28px;">{{ asc.desc }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel slide">
+                            <div class="carousel-inner">
+                                <div class="item active">
+                                    <div class="tile yellow">
+                                        <div class="tile-icon">
+                                            <i class="im-books s64"></i>
+                                        </div>
+                                        <div class="tile-content">
+                                            <h3 style="line-height: 28px;"><b>发布量</b>&nbsp;&nbsp;{{ works | default:0 }}</h3>
+                                            <h3 style="line-height: 28px;">{{ request.session.groups.0.name }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="carousel-tile carousel slide">
+                            <div class="carousel-inner">
+                                {% for uc in user_count %}
+                                    <div class="item {% if forloop.counter == 1 %}active{% endif %}" id="{{ uc.id }}">
+                                        <div class="tile purple">
+                                            <div class="tile-icon">
+                                                <i class="im-user s64"></i>
+                                            </div>
+                                            <div class="tile-content">
+                                                <h3 style="line-height: 28px;"><b>用户量</b>&nbsp;&nbsp;{{ uc.count | default:0 }}</h3>
+                                                <h3 style="line-height: 28px;">{{ uc.desc }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+            <div class="row">
+                <!-- Start .row -->
+                <!-- End col-lg-6 -->
+                <div class="col-lg-12 col-md-12 sortable-layout">
+                    <!-- Start col-lg-6 -->
+                    <div class="panel panel-primary plain">
+                        <!-- Start .panel -->
+                        <div class="panel-heading">
+                            <h4 class="panel-title"><i class="im-bars"></i> 平台发布汇总</h4>
+                        </div>
+                        <div class="panel-body blue-bg" style="height: 240px;">
+                            <div class="col-md-4 col-md-offset-8" style="margin-bottom: 10px;display: flex;">
+                                <button class="btn btn-xs btn-white btn-alt query-time" data-day="7" style="border-radius: 4px 0 0 4px;">本周</button>
+                                <button class="btn btn-xs btn-white btn-alt query-time active" data-day="30" style="border-radius: 0;">本月</button>
+                                <input type="date" class="form-control" name="start_time" style="border-radius: 0;">
+                                <input type="date" class="form-control" name="end_time" style="border-radius: 0;border-radius: 0 4px 4px 0;">
+                            </div>
+                            <div id="month-line-chart" style="width: 100%; height:180px;margin-top: 25px;">
+
+                            </div>
+                        </div>
+                        <div class="panel-footer white-bg">
+                            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                                <div id="work-type-chart" class="col-lg-12 col-md-12" style="height:210px;">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                                <div id="work-status-chart" class="col-lg-12 col-md-12" style="height:210px;">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="border-left: solid 1px #75b9e6; height: 100%">
+
+                                <table class="table display" id="data_table">
+                                    <thead>
+                                    <tr>
+                                        <th>系统</th>
+                                        <th>任务名称</th>
+                                        <th>环境</th>
+                                        <th>开始时间</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="data-content">
+
+                                    {% for work in work_list %}
+
+                                        <tr class="odd gradeX">
+                                            <td>{{ work.belong_sys }}</td>
+                                            <td title="{{ work.work_name }}">{{ work.work_name |slice:":9" }}</td>
+                                            <td>{{ work.work_type | default:'-' }}</td>
+                                            <td>{{ work.start_time | parse_timestamp }}</td>
+                                            <td>{{ work.work_status }}</td>
+                                            <td>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="font-size: large;cursor: pointer;text-align: right;">
+                                                    <i class="im-eye text-primary review" data-id="{{ work.id }}" title="查看"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    {% empty %}
+
+                                        <tr class="odd gradeX" id="empty_table">
+                                            <td colspan="6" style="text-align: center; vertical-align: middle;height: 150px;">暂无数据</td>
+                                        </tr>
+
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End .panel -->
+                    <!-- End .panel -->
+                </div>
+                <!-- End col-lg-6 -->
+            </div>
+        </div>
+    </div>
+    <div id="type-data" hidden>{{ data.sys_count }}</div>
+    <div id="status-data" hidden>{{ data.work_status }}</div>
+    <div id="daycount-data" hidden>{{ data.month }}</div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/assets/plugins/charts/echart/echarts.min.js"></script>
+    <script src="/static/js/tools.js"></script>
+    <script type="text/javascript">
+
+        function loadchart_daycount(data){
+            data = eval("(" + data + ")");
+            // 时间轴统计发布量
+            var dates = [],
+                timestamps = data.timestamp_month;
+            $.each(timestamps, function(index, item){
+                dates.push(autoops.getTimeTool('formatTimestamp')(item,'yyyy-MM-dd'));
+            });
+            var month_option = {
+                backgroundColor: 'transparent',
+                textStyle: {
+                    color: '#fff'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                grid: {
+                    left: '3%',
+                    right: '3%',
+                    bottom: '3%',
+                    top: '10',
+                    containLabel: true
+                },
+                legend: {
+                    data:['成功', '失败'],
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: true,
+                    axisLine : {
+                        lineStyle : {
+                            color : '#fff'
+                        }
+                    },
+                    data: dates,
+                    minInterval: 1
+                },
+                yAxis: {
+                    type: 'value',
+                    splitLine: {
+                        show: true,
+                        lineStyle : {
+                            color : 'rgba(255, 255, 255, 0.2)'
+                        }
+                    },
+                    axisLine : {
+                        lineStyle : {
+                            color : '#fff'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name:'成功',
+                        type:'line',
+                        data: data.data_success,
+                        smooth : true,
+                        z : 1,
+                        itemStyle : {
+                            color : '#90ed7d'
+                        },
+                        lineStyle : {
+                            color : '#90ed7d'
+                        }
+                    },
+                    {
+                        name:'失败',
+                        type:'line',
+                        data: data.data_error,
+                        smooth : true,
+                        z : 0,
+                        itemStyle : {
+                            color : '#eb5154'
+                        },
+                        lineStyle : {
+                            color : '#eb5154'
+                        }
+                    }
+                ]
+            };
+            var month_line_chart = echarts.init(document.getElementById('month-line-chart'));
+            month_line_chart.setOption(month_option, true);
+        }
+
+        $(document).ready(function(){
+
+            $('input[name="start_time"]').change(function(){
+                var start_time = autoops.getTimeTool('formatTimeStr')($(this).val()),
+                    checkResult = autoops.getTimeTool('checkTimeLgNowTime')(start_time),
+                    that = this;
+                if(checkResult){
+                    layer.msg('所选日期大于当前日期！', function () {
+                        $(that).val("");
+                    });
+                    return false;
+                }
+                var $endval = $('input[name="end_time"]').val();
+                if($endval !== ''){
+                    var end_time = autoops.getTimeTool('formatTimeStr')($endval);
+                    checkResult = autoops.getTimeTool('checkStartLgEnd')(start_time, end_time);
+                    if(checkResult){
+                        layer.msg('开始日期大于截止日期！', function () {
+                            $(that).val("");
+                        });
+                        return false;
+                    }else{
+                        $.post('{% url "get30dateline" %}',{start_time :  (start_time*1 + 24*60*60) , end_time : (end_time*1 + 24*60*60) } ,function(result){
+                            loadchart_daycount(result)
+                        });
+                    }
+                }
+            });
+
+            $('input[name="end_time"]').change(function(){
+                var start_time = autoops.getTimeTool('formatTimeStr')($('input[name="start_time"]').val()),
+                    end_time = autoops.getTimeTool('formatTimeStr')($(this).val()),
+                    checkResult = autoops.getTimeTool('checkTimeLgNowTime')(end_time),
+                    that = this;
+                if(checkResult){
+                    layer.msg('所选日期大于当前日期！', function () {
+                        $(that).val("");
+                    });
+                    return false;
+                }
+                checkResult = autoops.getTimeTool('checkStartLgEnd')(start_time, end_time);
+                if(checkResult){
+                    layer.msg('开始日期大于截止日期！', function () {
+                        $(that).val("");
+                    });
+                    return false;
+                }else{
+                    $.post('{% url "get30dateline" %}',{start_time :  (start_time*1 + 24*60*60) , end_time : (end_time*1 + 24*60*60) } ,function(result){
+                        loadchart_daycount(result)
+                    });
+                }
+            });
+
+            $('.query-time').click(function(){
+                $('.query-time').removeClass('active');
+                $(this).addClass('active');
+                $.post('{% url "get30dayline" %}',{day : $(this).attr('data-day')} ,function(result){
+                    loadchart_daycount(result)
+                });
+            });
+
+            $('.review').click(function(){
+                window.location.href = '{% url 'view_work_env' %}?menu=issue&work_id=' + $(this).attr('data-id');
+            });
+
+            loadchart_daycount($('#daycount-data').text());
+
+            // 饼图统计发布量
+            var type_data = eval("(" + $('#type-data').text() + ")"),
+                type_ud = [];
+            $.each(type_data, function(index, item){
+                var serobj = {name:item.desc,value: item.count};
+                type_ud.push(serobj);
+            });
+            var is_supseruser = "{{ request.session.user.is_superuser }}";
+            var otherData = "{{ data.other }}";
+            if (is_supseruser === 'False'){
+                var serobj = {name:"其他组",value: otherData};
+                type_ud.push(serobj);
+            }
+            var work_type_option = {
+                    title : {
+                        text : '各系统发布任务数占比'
+                    },
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+				color : ['#37a2da','#32c5e9','#9fe6b8','#67e0e3','#ffdb5c','#ff9f7f','#fb7293','#e062ae','#e690d1','#e7bcf3','#9d96f5','#8378ea','#96efff'],
+                    series : [
+                        {
+                            name: '各系统发布任务数占比',
+                            type: 'pie',
+                            radius : '55%',
+                            center: ['50%', '60%'],
+                            data: type_ud,
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                },
+                work_type_chart = echarts.init(document.getElementById('work-type-chart'));
+            work_type_chart.setOption(work_type_option);
+
+            // 饼图统计发布状态占比
+            var status_data = eval("(" + $('#status-data').text() + ")"),
+                status_ud = [
+                    {value:0, name:'未开始',itemStyle:{color : '#f2914a'}},
+                    {value:0, name:'执行中',itemStyle:{color : '#2accff'}},
+                    {value:0, name:'执行异常',itemStyle:{color : '#fe768c'}},
+                    {value:0, name:'执行中断',itemStyle:{color : '#fcd74a'}},
+                    {value:0, name:'执行成功',itemStyle:{color : '#80c26a'}},
+                    {value:0, name:'回退成功',itemStyle:{color : '#af91e1'}},
+                    {value:0, name:'无更新',itemStyle:{color : '#79859b'}}
+                ];
+            $.each(status_ud, function(index, item){
+                $.each(status_data, function(key, object){
+                    if(item.name === object.name){
+                        item.value = object.value;
+                    }
+                });
+            });
+            var work_status_option = {
+                title : {
+                    text : '任务执行状态占比'
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                series : [
+                    {
+                        name: '任务执行状态占比',
+                        type: 'pie',
+                        radius : '55%',
+                        center: ['50%', '60%'],
+                        data: status_ud,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            var work_status_chart = echarts.init(document.getElementById('work-status-chart'));
+            work_status_chart.setOption(work_status_option);
+        });
+
+
+    </script>
+
+
+{% endblock %}

@@ -1,0 +1,210 @@
+{% extends 'frame.html' %}
+{% load filter %}
+
+{% block css %}
+
+    <link href="/static/css/work.css" rel="stylesheet" />
+    <link href="/static/assets/plugins/layui/css/layui.css" rel="stylesheet" />
+    <style>
+        .file-upload {
+            display: none;
+        }
+        #files-preview {
+            height: 15em;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            border: solid 1px #eee;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+        <div class="row">
+            <!-- Start .row -->
+            <!-- Start .page-header -->
+            <div class="col-lg-12 heading">
+                <h1 class="page-header"><i class="im-users"></i> 更新任务执行配置项</h1>
+
+                <button type="button" class="btn btn-primary" id="title-btn" title="返回"><i class="im-undo"></i>&nbsp; 返回</button>
+
+
+            </div>
+            <!-- End .page-header -->
+        </div>
+        <!-- End .row -->
+        <div class="outlet">
+            <!-- Start .outlet -->
+            <form  class="form-horizontal" role="form">
+                <input type="hidden" name="id" value="{{ work.id }}">
+                <input type="hidden" name="run_user" value="{{ work.run_user | default:request.session.user.username }}">
+                <input type="hidden" name="work_status" value="{{ work.work_status | default:0 }}">
+                <input type="hidden" name="run_status" value="{{ work.run_status | default:0 }}">
+                <!-- Page start here ( usual with .row ) -->
+                <div class="row" id="user-group-container">
+
+                    <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12"></div>
+
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 form-content">
+
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-12 control-label">任务名称</label>
+                            <div class="col-lg-10 col-md-10">
+                                <input type="text" name="work_name" value="{{ work.work_name }}" readonly class="form-control limitInput required" placeholder="请输入任务名称"  maxlength="20">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-12 control-label">执行状态</label>
+                            <div class="col-lg-10 col-md-10">
+                                <input type="text" name="work_name" value="未开始" readonly class="form-control limitInput required" placeholder="请输入任务名称"  maxlength="20">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-12 control-label">发布环节</label>
+                            <div class="col-lg-10 col-md-10">
+                                <input type="text" name="work_name" value="测试环境" readonly class="form-control limitInput required" placeholder="请输入作业名称"  maxlength="20">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-12 control-label">执行方式</label>
+                            <div class="col-lg-4 col-md-4">
+                                <label class="radio-inline"><input type="radio" name="runway" >手动</label>
+                                <label class="radio-inline"><input type="radio" name="runway" checked>定时</label>
+                                {% for way in runway %}
+                                    <label class="radio-inline">
+                                        <input type="radio" name="runway" value="{{ forloop.counter0 }}" {% if work.runway == forloop.counter0 %}checked{% endif %}>
+                                        {{ way }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <label class="col-lg-2 col-md-2 col-sm-12 control-label">定时规则</label>
+                            <div class="col-lg-4 col-md-4">
+                                <input type="text" class="form-control" name="time_rule" value="{{ work.time_rule }}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-2 col-md-2 col-sm-12 control-label">选择服务器</label>
+                            <div class="col-lg-10 col-md-10">
+                                <input type="hidden" name="host_list">
+                                <div class="panel panel-default" style="border: solid 1px #e4e9eb;">
+                                    <div class="panel-body" style="border: none;">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>服务器类型</th>
+                                                <th>IP地址</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="host-selector">
+
+                                            <tr id="host_1" class="host" onclick="toggleSelect(this);">
+                                                <td>APP</td>
+                                                <td>192.168.43.1</td>
+                                            </tr>
+
+                                            <tr id="host_1" class="host" onclick="toggleSelect(this);">
+                                                <td>DB</td>
+                                                <td>192.168.42.1</td>
+                                            </tr>
+
+                                            {% for host in work.host_list %}
+                                                <tr id="host_{{ host.id }}" class="host host-selected" onclick="toggleSelect(this);">
+                                                    <td>{{ host.server_type }}</td>
+                                                    <td>{{ host.IP }}</td>
+                                                </tr>
+                                            {% endfor %}
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="work-param" style="border: solid 1px #ddd; padding: 20px 10px;border-radius: 4px">
+
+                            <div class="form-group">
+                                <label class="col-lg-3 col-md-3 col-sm-12 control-label">应用APP目录</label>
+                                <div class="col-lg-9 col-md-9">
+                                    <input type="text" data-v-index="1" data-v-info="应用APP目录" class="value-list form-control left-icon" placeholder="请输入参数" value="opt">
+                                    <i class="fa-dollar s16 left-input-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-3 col-md-3 col-sm-12 control-label">应用APP目录</label>
+                                <div class="col-lg-9 col-md-9">
+                                    <input type="text" data-v-index="1" data-v-info="应用APP目录" class="value-list form-control left-icon" placeholder="请输入参数" value="opt">
+                                    <i class="fa-dollar s16 left-input-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-3 col-md-3 col-sm-12 control-label">应用APP目录</label>
+                                <div class="col-lg-9 col-md-9">
+                                    <input type="text" data-v-index="1" data-v-info="应用APP目录" class="value-list form-control left-icon" placeholder="请输入参数" value="opt">
+                                    <i class="fa-dollar s16 left-input-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-lg-3 col-md-3 col-sm-12 control-label">应用APP目录</label>
+                                <div class="col-lg-9 col-md-9">
+                                    <input type="text" data-v-index="1" data-v-info="应用APP目录" class="value-list form-control left-icon" placeholder="请输入参数" value="opt">
+                                    <i class="fa-dollar s16 left-input-icon"></i>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align: center;padding: 30px 0;">
+
+                            <button type="button" class="btn btn-primary" id="save" style="width: 15%;">保&nbsp;&nbsp;存</button>
+                            <button type="reset" class="btn btn-warning" id="save" style="width: 15%;">重&nbsp;&nbsp;置</button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-content">
+
+                        <div id="work-param">
+
+                            {% for vl in work.value_list %}
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-md-3 col-sm-12 control-label">{{ vl.info }}</label>
+                                    <div class="col-lg-9 col-md-9">
+                                        <input type="text" data-v-index="{{ vl.key }}" data-v-info="{{ vl.info }}" class="value-list form-control left-icon" placeholder="请输入参数" value="{{ vl.value }}">
+                                        <i class="fa-dollar s16 left-input-icon"></i>
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/assets/plugins/layui/layui.js"></script>
+    <script src="/static/plugins/layer/layer.js"></script>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+<script src="/static/js/jquery-2.1.1.min.js"></script>
+<script>
+
+</script>
+</head>
+<body>
+<b>展示用户所对应的所有模板<br/></b>
+{% for temp in temps %}
+    <a href="{% url 'show_servers_env' %}?temp={{ temp.id }}">{{ temp.tmp_name }}-{{ temp.belong_sys }}-{{ temp.tmp_type }}</a><br/>
+{% endfor %}
+
+</body>
+</html>
